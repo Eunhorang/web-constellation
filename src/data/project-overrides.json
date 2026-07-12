@@ -124,5 +124,20 @@
     "accent": "#7c7163",
     "launchedAt": "2026-07-12",
     "note": "GitHub Pages로 공개된 새 웹사이트입니다."
+  },
+  {
+    "repo": "good-habits-for-students",
+    "title": "오늘부터 한 걸음",
+    "description": "초등학교 3~6학년 학생이 생활습관과 자기관리 능력을 사례와 역할극으로 연습할 수 있는 교육 웹사이트입니다.",
+    "liveUrl": "https://eunhorang.github.io/good-habits-for-students/",
+    "category": "교육",
+    "status": "live",
+    "tags": ["생활습관", "자기관리", "역할극", "TypeScript"],
+    "featured": false,
+    "hidden": false,
+    "order": 10,
+    "accent": "#647b69",
+    "launchedAt": "2026-07-13",
+    "note": "GitHub Pages로 공개된 초등학생 생활습관·자기관리 교육 웹사이트입니다."
   }
 ]
