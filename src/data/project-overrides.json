@@ -82,5 +82,33 @@
     "accent": "#6f7765",
     "launchedAt": "2026-07-12",
     "note": "현재 보고 있는 웹 아카이브의 공개 저장소입니다."
+  },
+  {
+    "repo": "gyosil-ai-learning",
+    "title": "교실 AI 학습",
+    "description": "초등교사를 위한 단계별 AI 학습, 수업 활용 자료와 교사 업무 도구를 모은 웹사이트입니다.",
+    "category": "AI 학습",
+    "status": "live",
+    "tags": ["AI", "교육", "교사", "Next.js"],
+    "featured": false,
+    "hidden": false,
+    "order": 7,
+    "accent": "#687a72",
+    "launchedAt": "2026-07-12",
+    "note": "GitHub Pages로 공개된 새 웹사이트입니다."
+  },
+  {
+    "repo": "yeonsudam-teacher-training-manager",
+    "title": "연수담 교원 연수 관리",
+    "description": "초등교사가 연도별 법정의무연수와 개인연수를 한곳에서 관리할 수 있도록 만드는 웹앱입니다.",
+    "category": "교사 업무",
+    "status": "building",
+    "tags": ["교원 연수", "업무 관리", "TypeScript"],
+    "featured": false,
+    "hidden": false,
+    "order": 8,
+    "accent": "#7b7064",
+    "launchedAt": "2026-07-12",
+    "note": "공개 저장소는 있으나 배포 사이트가 없어 준비 중으로 표시합니다."
   }
 ]

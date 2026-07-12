@@ -1,9 +1,48 @@
 {
   "schemaVersion": 1,
   "githubUsername": "Eunhorang",
-  "generatedAt": "2026-07-12T04:56:21.618Z",
+  "generatedAt": "2026-07-12T06:41:06.180Z",
   "source": "github",
   "projects": [
+    {
+      "repo": "yeonsudam-teacher-training-manager",
+      "title": "Yeonsudam Teacher Training Manager",
+      "description": "대한민국 초등교사를 위한 연도별 법정의무연수·개인연수 관리 웹앱",
+      "githubUrl": "https://github.com/Eunhorang/yeonsudam-teacher-training-manager",
+      "homepageUrl": null,
+      "hasPages": false,
+      "pagesUrl": null,
+      "liveUrl": null,
+      "language": "TypeScript",
+      "topics": [],
+      "stars": 0,
+      "updatedAt": "2026-07-12T06:38:23Z",
+      "archived": false,
+      "fork": false
+    },
+    {
+      "repo": "gyosil-ai-learning",
+      "title": "Gyosil Ai Learning",
+      "description": "초등교사를 위한 단계별 AI 학습·수업 활용·교사 업무 도구 모음",
+      "githubUrl": "https://github.com/Eunhorang/gyosil-ai-learning",
+      "homepageUrl": "https://eunhorang.github.io/gyosil-ai-learning/",
+      "hasPages": true,
+      "pagesUrl": "https://eunhorang.github.io/gyosil-ai-learning/",
+      "liveUrl": "https://eunhorang.github.io/gyosil-ai-learning/",
+      "language": "TypeScript",
+      "topics": [
+        "ai",
+        "education",
+        "github-pages",
+        "korean",
+        "nextjs",
+        "teachers"
+      ],
+      "stars": 0,
+      "updatedAt": "2026-07-12T06:35:20Z",
+      "archived": false,
+      "fork": false
+    },
     {
       "repo": "web-constellation",
       "title": "Web Constellation",
@@ -16,7 +55,7 @@
       "language": "TypeScript",
       "topics": [],
       "stars": 0,
-      "updatedAt": "2026-07-12T04:54:39Z",
+      "updatedAt": "2026-07-12T06:27:15Z",
       "archived": false,
       "fork": false
     },
