@@ -32,6 +32,46 @@ const allowedProjectKeys = new Set([
   "archived",
   "fork",
 ]);
+const requiredPngAssets = new Map([
+  ["favicon-32x32.png", [32, 32]],
+  ["apple-touch-icon.png", [180, 180]],
+  ["icons/icon-192.png", [192, 192]],
+  ["icons/icon-512.png", [512, 512]],
+  ["icons/icon-maskable-512.png", [512, 512]],
+]);
+const requiredManifestIcons = [
+  ["icons/icon-192.png", "192x192", "any"],
+  ["icons/icon-512.png", "512x512", "any"],
+  ["icons/icon-maskable-512.png", "512x512", "maskable"],
+];
+
+async function validatePng(relativePath, expectedSize) {
+  const filePath = path.join(distDirectory, relativePath);
+  const buffer = await fs.readFile(filePath);
+  const signature = buffer.subarray(0, 8).toString("hex");
+  const chunkType = buffer.subarray(12, 16).toString("ascii");
+  const width = buffer.readUInt32BE(16);
+  const height = buffer.readUInt32BE(20);
+  const colorType = buffer[25];
+  if (signature !== "89504e470d0a1a0a" || chunkType !== "IHDR") {
+    throw new Error(`홈 화면 아이콘이 올바른 PNG가 아닙니다: ${relativePath}`);
+  }
+  if (width !== expectedSize[0] || height !== expectedSize[1]) {
+    throw new Error(
+      `홈 화면 아이콘 크기가 다릅니다: ${relativePath} (${width}x${height})`,
+    );
+  }
+  if ([4, 6].includes(colorType) || buffer.includes(Buffer.from("tRNS"))) {
+    throw new Error(`홈 화면 아이콘 배경은 투명하면 안 됩니다: ${relativePath}`);
+  }
+}
+
+function linkHref(html, relation) {
+  const tag = [...html.matchAll(/<link\b[^>]*>/g)].find((match) =>
+    match[0].includes(`rel="${relation}"`),
+  )?.[0];
+  return tag?.match(/href="([^"]+)"/)?.[1] || null;
+}
 
 async function listFiles(directory) {
   const entries = await fs.readdir(directory, { withFileTypes: true });
@@ -64,6 +104,56 @@ for (const project of generated.projects) {
 }
 
 const files = await listFiles(distDirectory);
+for (const [relativePath, expectedSize] of requiredPngAssets) {
+  await validatePng(relativePath, expectedSize);
+}
+
+const manifest = JSON.parse(
+  await fs.readFile(path.join(distDirectory, "site.webmanifest"), "utf8"),
+);
+if (
+  typeof manifest.name !== "string" ||
+  typeof manifest.short_name !== "string" ||
+  manifest.start_url !== "./" ||
+  manifest.scope !== "./" ||
+  manifest.display !== "standalone" ||
+  !Array.isArray(manifest.icons)
+) {
+  throw new Error("모바일 웹앱 manifest의 필수 설정이 올바르지 않습니다.");
+}
+for (const icon of manifest.icons) {
+  if (
+    typeof icon?.src !== "string" ||
+    icon.src.startsWith("/") ||
+    icon.src.includes("..") ||
+    icon.src.includes("%BASE_URL%")
+  ) {
+    throw new Error(`manifest 아이콘 경로는 안전한 상대 경로여야 합니다: ${icon?.src}`);
+  }
+}
+for (const [src, sizes, purpose] of requiredManifestIcons) {
+  const icon = manifest.icons.find((candidate) => candidate?.src === src);
+  if (
+    !icon ||
+    icon.sizes !== sizes ||
+    icon.type !== "image/png" ||
+    icon.purpose !== purpose
+  ) {
+    throw new Error(`manifest 아이콘 설정이 부족합니다: ${src}`);
+  }
+}
+
+const indexHtml = await fs.readFile(path.join(distDirectory, "index.html"), "utf8");
+const manifestHref = linkHref(indexHtml, "manifest");
+const appleIconHref = linkHref(indexHtml, "apple-touch-icon");
+if (!manifestHref?.endsWith("/site.webmanifest")) {
+  throw new Error("빌드 HTML에 웹앱 manifest 경로가 올바르게 연결되지 않았습니다.");
+}
+const basePrefix = manifestHref.slice(0, -"site.webmanifest".length);
+if (appleIconHref !== `${basePrefix}apple-touch-icon.png`) {
+  throw new Error("Apple 홈 화면 아이콘과 manifest의 배포 경로가 다릅니다.");
+}
+
 const currentTokens = [process.env.GITHUB_TOKEN, process.env.GH_TOKEN].filter(
   (token) => typeof token === "string" && token.length >= 20,
 );
@@ -81,6 +171,7 @@ const forbiddenMarkers = [
   "__SITE_DESCRIPTION__",
   "__OG_IMAGE_URL__",
   "__STRUCTURED_DATA__",
+  "%BASE_URL%",
   "정주의 웹 별자리",
 ];
 
@@ -95,4 +186,6 @@ for (const filePath of files) {
   }
 }
 
-console.log(`[security] 공개 프로젝트 ${generated.projects.length}개와 dist 토큰 노출 검사를 통과했습니다.`);
+console.log(
+  `[security] 공개 프로젝트 ${generated.projects.length}개, 홈 화면 아이콘, dist 토큰 노출 검사를 통과했습니다.`,
+);

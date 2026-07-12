@@ -1,0 +1,35 @@
+{
+  "name": "은호랑의 웹 별자리",
+  "short_name": "은호랑 별자리",
+  "description": "이정주가 만든 웹 프로젝트를 한눈에 탐색하고, 각 웹사이트와 GitHub 저장소로 이동할 수 있는 개인 웹 아카이브입니다.",
+  "lang": "ko",
+  "dir": "ltr",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "prefer_related_applications": false,
+  "background_color": "#F4F2EC",
+  "theme_color": "#F4F2EC",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

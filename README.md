@@ -13,6 +13,7 @@
 - 검색/필터 상태가 포함된 공유 가능한 주소
 - 대표 프로젝트와 제작 중인 프로젝트 영역
 - 모바일 우선 반응형 화면
+- iPhone·Android 홈 화면용 전용 앱 아이콘
 - GitHub Pages 자동 배포와 매일 한 번 자동 동기화
 - 검색 엔진 및 공유용 메타 정보, 구조화 데이터, 1200×630 공유 이미지
 - GitHub API 실패 시 마지막 정상 캐시로 계속 빌드하는 안전장치
@@ -26,7 +27,11 @@ web-constellation/
 ├─ .github/workflows/
 │  └─ deploy-pages.yml          # GitHub Pages 자동 검사·배포
 ├─ public/
-│  ├─ favicon.svg               # 브라우저 탭 아이콘
+│  ├─ favicon.svg               # 아이콘 백터 원본
+│  ├─ favicon-32x32.png          # 브라우저 탭 PNG 아이콘
+│  ├─ apple-touch-icon.png       # iPhone 홈 화면 180×180 아이콘
+│  ├─ icons/                     # Android 192·512px 설치 아이콘
+│  ├─ site.webmanifest           # 모바일 웹앱 이름·아이콘 설정
 │  ├─ og-image-eunhorang.png    # 1200×630 공유 이미지
 │  ├─ og-image.png              # 이전 공유 주소 호환용 사본
 │  ├─ robots.txt                # 검색 로봇 안내(빌드 시 갱신)
@@ -35,6 +40,7 @@ web-constellation/
 │  ├─ github-sync-core.mjs      # GitHub 수집·검증 핵심 기능
 │  ├─ sync-github.mjs           # 공개 저장소 동기화 실행 파일
 │  ├─ generate-og-image.mjs     # 사이트 공유 이미지 다시 만들기
+│  ├─ generate-app-icons.mjs    # 홈 화면 아이콘 PNG 다시 만들기
 │  ├─ generate-seo.mjs          # robots.txt와 sitemap.xml 생성
 │  ├─ prepare-build.mjs         # 빌드 전 동기화와 SEO 준비
 │  └─ check-build-security.mjs  # 비공개 정보·토큰 노출 검사
@@ -285,13 +291,19 @@ npm run check:build
 
 생성 데이터에 비공개 저장소가 없는지, 배포 파일에 GitHub 토큰이 들어가지 않았는지 검사합니다.
 
-사이트 이름을 바꾸어 공유 이미지도 다시 만들어야 할 때만 다음 명령을 사용합니다. Mac에 ImageMagick이 설치되어 있어야 하며, 평소 사이트 실행에는 필요하지 않습니다.
+사이트 이름을 바꾸어 공유 이미지도 다시 만들어야 할 때는 다음 명령을 사용합니다.
 
 ```bash
 npm run generate:og
 ```
 
-`magick` 명령을 찾을 수 없다는 오류가 나오면 `brew install imagemagick`을 한 번 실행한 뒤 다시 시도합니다.
+홈 화면 아이콘 원본 `public/favicon.svg`를 바꾼 때는 다음 명령으로 iPhone·Android용 PNG를 다시 만듭니다.
+
+```bash
+npm run generate:icons
+```
+
+두 명령은 모두 ImageMagick을 사용합니다. `magick` 명령을 찾을 수 없다는 오류가 나오면 `brew install imagemagick`을 한 번 실행한 뒤 다시 시도합니다.
 
 ```bash
 npm run preview
@@ -312,6 +324,7 @@ npm run preview
 9. 사이트 방문과 GitHub 링크가 새 탭에서 열리는지 확인합니다.
 10. 실제 사이트 주소가 없는 테스트 데이터에서는 방문 버튼이 나타나지 않는지 확인합니다.
 11. 개발자 도구 Console에 빨간 오류가 없는지 확인합니다.
+12. iPhone·Android에서 기존 홈 화면 바로가기를 지우고 다시 추가해 새 궤도 아이콘이 보이는지 확인합니다.
 
 ## 10. GitHub Pages 배포
 
