@@ -20,7 +20,7 @@ describe("JSON 설정 검증", () => {
     );
   });
 
-  it("검증된 수동 설정이 자동 사이트 주소를 실수로 숨기지 않는다", () => {
+  it("자동 사이트 주소 유지와 수동 빈 주소의 의도적 숨김을 구분한다", () => {
     const generated = validateGeneratedProjects(generatedJson);
     const overrides = validateProjectOverrides(overridesJson);
     const projects = mergeProjects(generated.projects, overrides);

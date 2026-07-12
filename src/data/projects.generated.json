@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "githubUsername": "Eunhorang",
-  "generatedAt": "2026-07-12T13:24:23.566Z",
+  "generatedAt": "2026-07-12T13:41:51.289Z",
   "source": "github",
   "projects": [
     {
@@ -16,7 +16,31 @@
       "language": "TypeScript",
       "topics": [],
       "stars": 0,
-      "updatedAt": "2026-07-12T13:18:37Z",
+      "updatedAt": "2026-07-12T13:40:40Z",
+      "archived": false,
+      "fork": false
+    },
+    {
+      "repo": "yeonsudam-teacher-training-manager",
+      "title": "Yeonsudam Teacher Training Manager",
+      "description": "대한민국 초등교사를 위한 연도별 의무연수·개인연수 관리 웹앱",
+      "githubUrl": "https://github.com/Eunhorang/yeonsudam-teacher-training-manager",
+      "homepageUrl": "https://yeonsudam-teacher-training.rn-act.chatgpt.site/",
+      "hasPages": false,
+      "pagesUrl": null,
+      "liveUrl": "https://yeonsudam-teacher-training.rn-act.chatgpt.site/",
+      "language": "TypeScript",
+      "topics": [
+        "education",
+        "korean",
+        "nextjs",
+        "teacher-tools",
+        "teacher-training",
+        "training-management",
+        "typescript"
+      ],
+      "stars": 0,
+      "updatedAt": "2026-07-12T13:38:21Z",
       "archived": false,
       "fork": false
     },
@@ -33,22 +57,6 @@
       "topics": [],
       "stars": 0,
       "updatedAt": "2026-07-12T12:23:25Z",
-      "archived": false,
-      "fork": false
-    },
-    {
-      "repo": "yeonsudam-teacher-training-manager",
-      "title": "Yeonsudam Teacher Training Manager",
-      "description": "대한민국 초등교사를 위한 연도별 법정의무연수·개인연수 관리 웹앱",
-      "githubUrl": "https://github.com/Eunhorang/yeonsudam-teacher-training-manager",
-      "homepageUrl": null,
-      "hasPages": false,
-      "pagesUrl": null,
-      "liveUrl": null,
-      "language": "TypeScript",
-      "topics": [],
-      "stars": 0,
-      "updatedAt": "2026-07-12T06:38:23Z",
       "archived": false,
       "fork": false
     },
