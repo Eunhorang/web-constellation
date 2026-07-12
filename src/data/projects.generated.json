@@ -1,9 +1,25 @@
 {
   "schemaVersion": 1,
   "githubUsername": "Eunhorang",
-  "generatedAt": "2026-07-12T04:51:14.116Z",
+  "generatedAt": "2026-07-12T04:56:21.618Z",
   "source": "github",
   "projects": [
+    {
+      "repo": "web-constellation",
+      "title": "Web Constellation",
+      "description": "이정주가 만든 웹 프로젝트를 한곳에 모은 개인 웹 아카이브",
+      "githubUrl": "https://github.com/Eunhorang/web-constellation",
+      "homepageUrl": null,
+      "hasPages": true,
+      "pagesUrl": "https://eunhorang.github.io/web-constellation/",
+      "liveUrl": "https://eunhorang.github.io/web-constellation/",
+      "language": "TypeScript",
+      "topics": [],
+      "stars": 0,
+      "updatedAt": "2026-07-12T04:54:39Z",
+      "archived": false,
+      "fork": false
+    },
     {
       "repo": "child-abuse-mandatory-reporter-training",
       "title": "Child Abuse Mandatory Reporter Training",

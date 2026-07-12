@@ -68,5 +68,19 @@
     "accent": "#607b72",
     "launchedAt": "2026-07-11",
     "note": "실제로 공개된 저장소입니다."
+  },
+  {
+    "repo": "web-constellation",
+    "title": "정주의 웹 별자리",
+    "description": "직접 만든 웹사이트와 공개 프로젝트를 좌표처럼 연결해 한곳에서 탐색하는 개인 웹 아카이브입니다.",
+    "category": "아카이브",
+    "status": "live",
+    "tags": ["React", "TypeScript", "GitHub Pages"],
+    "featured": false,
+    "hidden": false,
+    "order": 6,
+    "accent": "#6f7765",
+    "launchedAt": "2026-07-12",
+    "note": "현재 보고 있는 웹 아카이브의 공개 저장소입니다."
   }
 ]
