@@ -7,7 +7,7 @@ const site = {
   repository: "web-constellation",
   owner: "이정주",
   email: "owner@example.com",
-  siteName: "정주의 웹 별자리",
+  siteName: "은호랑의 웹 별자리",
   description: "테스트 설명",
 };
 
