@@ -1,9 +1,25 @@
 {
   "schemaVersion": 1,
   "githubUsername": "Eunhorang",
-  "generatedAt": "2026-07-12T15:55:26.263Z",
+  "generatedAt": "2026-07-12T22:17:37.718Z",
   "source": "github",
   "projects": [
+    {
+      "repo": "investment-baseline",
+      "title": "Investment Baseline",
+      "description": "초보 주식 투자자를 위한 목적·원칙·위험 중심 금융문해력 웹사이트",
+      "githubUrl": "https://github.com/Eunhorang/investment-baseline",
+      "homepageUrl": "https://eunhorang.github.io/investment-baseline/",
+      "hasPages": true,
+      "pagesUrl": "https://eunhorang.github.io/investment-baseline/",
+      "liveUrl": "https://eunhorang.github.io/investment-baseline/",
+      "language": "Astro",
+      "topics": [],
+      "stars": 0,
+      "updatedAt": "2026-07-12T22:08:34Z",
+      "archived": false,
+      "fork": false
+    },
     {
       "repo": "good-habits-for-students",
       "title": "Good Habits For Students",
@@ -16,7 +32,7 @@
       "language": "TypeScript",
       "topics": [],
       "stars": 0,
-      "updatedAt": "2026-07-12T15:55:18Z",
+      "updatedAt": "2026-07-12T16:05:23Z",
       "archived": false,
       "fork": false
     },
@@ -32,7 +48,7 @@
       "language": "TypeScript",
       "topics": [],
       "stars": 0,
-      "updatedAt": "2026-07-12T15:48:46Z",
+      "updatedAt": "2026-07-12T15:56:56Z",
       "archived": false,
       "fork": false
     },
