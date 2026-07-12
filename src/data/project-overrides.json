@@ -1,0 +1,72 @@
+[
+  {
+    "repo": "ai-one-step",
+    "title": "AI 한 걸음",
+    "description": "AI 기초부터 웹·앱 개발과 자동화까지 차근차근 배우는 단계별 학습 사이트입니다.",
+    "category": "AI 학습",
+    "status": "live",
+    "tags": ["AI", "학습", "TypeScript"],
+    "featured": true,
+    "hidden": false,
+    "order": 1,
+    "accent": "#66766a",
+    "launchedAt": "2026-07-11",
+    "note": "실제로 공개된 저장소를 관리하는 예시입니다."
+  },
+  {
+    "repo": "child-abuse-mandatory-reporter-training",
+    "title": "아동학대 신고의무자 교육",
+    "description": "초등학교 교직원이 핵심 내용을 이해하기 쉽게 정리한 아동학대 신고의무자 교육 웹자료입니다.",
+    "category": "교육",
+    "status": "live",
+    "tags": ["교직원 연수", "안전", "HTML"],
+    "featured": true,
+    "hidden": false,
+    "order": 2,
+    "accent": "#8a6d55",
+    "launchedAt": "2026-07-12",
+    "note": "실제로 공개된 저장소를 관리하는 예시입니다."
+  },
+  {
+    "repo": "sky-we-share",
+    "title": "하늘을 나눠 가진 우리",
+    "description": "가족이 함께 그린 하늘을 한곳에서 감상하도록 만든 따뜻한 온라인 그림전입니다.",
+    "category": "가족·전시",
+    "status": "live",
+    "tags": ["온라인 전시", "가족", "CSS"],
+    "featured": true,
+    "hidden": false,
+    "order": 3,
+    "accent": "#718294",
+    "launchedAt": "2026-07-11",
+    "note": "실제로 공개된 저장소를 관리하는 예시입니다."
+  },
+  {
+    "repo": "lee-jeongju-writer-portfolio",
+    "title": "이정주 작가 포트폴리오",
+    "description": "글과 생각, 작업의 흔적을 차분하게 모아 소개하는 개인 작가 포트폴리오입니다.",
+    "category": "글쓰기·포트폴리오",
+    "status": "live",
+    "tags": ["글쓰기", "포트폴리오", "CSS"],
+    "featured": false,
+    "hidden": false,
+    "order": 4,
+    "accent": "#7a6f86",
+    "launchedAt": "2026-07-11",
+    "note": "실제로 공개된 저장소입니다."
+  },
+  {
+    "repo": "Eunhorang.github.io",
+    "title": "이은호 축구 포트폴리오",
+    "description": "축구 활동과 성장 기록을 한곳에서 살펴볼 수 있도록 만든 개인 포트폴리오입니다.",
+    "category": "포트폴리오",
+    "status": "live",
+    "tags": ["축구", "포트폴리오", "HTML"],
+    "featured": false,
+    "hidden": false,
+    "order": 5,
+    "accent": "#607b72",
+    "launchedAt": "2026-07-11",
+    "note": "실제로 공개된 저장소입니다."
+  }
+]

@@ -1,0 +1,20 @@
+# 설치한 외부 패키지와 빌드 결과
+node_modules/
+dist/
+coverage/
+
+# 개인 환경 설정과 비밀 값
+.env*
+!.env.example
+
+# 운영체제와 편집기 임시 파일
+.DS_Store
+*.log
+
+# 이전/로컬 개발 도구의 생성 파일
+.next/
+.vinext/
+.wrangler/
+.playwright-cli/
+output/playwright/
+*.tsbuildinfo
