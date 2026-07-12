@@ -101,16 +101,15 @@
     "repo": "yeonsudam-teacher-training-manager",
     "title": "연수담 교원 연수 관리",
     "description": "초등교사가 연도별 법정의무연수와 개인연수를 한곳에서 관리할 수 있도록 만드는 웹앱입니다.",
-    "liveUrl": "",
     "category": "교사 업무",
-    "status": "building",
+    "status": "live",
     "tags": ["교원 연수", "업무 관리", "TypeScript"],
     "featured": false,
     "hidden": false,
     "order": 8,
     "accent": "#7b7064",
     "launchedAt": "2026-07-12",
-    "note": "저장소의 homepage는 로그인이 필요해, 공개 배포 전까지 사이트 방문 버튼을 숨깁니다."
+    "note": "GitHub Pages로 공개된 교원 연수 관리 웹앱입니다."
   },
   {
     "repo": "question-garden",

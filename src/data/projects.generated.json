@@ -1,9 +1,33 @@
 {
   "schemaVersion": 1,
   "githubUsername": "Eunhorang",
-  "generatedAt": "2026-07-12T13:41:51.289Z",
+  "generatedAt": "2026-07-12T14:08:08.660Z",
   "source": "github",
   "projects": [
+    {
+      "repo": "yeonsudam-teacher-training-manager",
+      "title": "Yeonsudam Teacher Training Manager",
+      "description": "대한민국 초등교사를 위한 연도별 의무연수·개인연수 관리 웹앱",
+      "githubUrl": "https://github.com/Eunhorang/yeonsudam-teacher-training-manager",
+      "homepageUrl": "https://eunhorang.github.io/yeonsudam-teacher-training-manager/",
+      "hasPages": true,
+      "pagesUrl": "https://eunhorang.github.io/yeonsudam-teacher-training-manager/",
+      "liveUrl": "https://eunhorang.github.io/yeonsudam-teacher-training-manager/",
+      "language": "TypeScript",
+      "topics": [
+        "education",
+        "korean",
+        "nextjs",
+        "teacher-tools",
+        "teacher-training",
+        "training-management",
+        "typescript"
+      ],
+      "stars": 0,
+      "updatedAt": "2026-07-12T14:01:01Z",
+      "archived": false,
+      "fork": false
+    },
     {
       "repo": "web-constellation",
       "title": "Web Constellation",
@@ -16,31 +40,7 @@
       "language": "TypeScript",
       "topics": [],
       "stars": 0,
-      "updatedAt": "2026-07-12T13:40:40Z",
-      "archived": false,
-      "fork": false
-    },
-    {
-      "repo": "yeonsudam-teacher-training-manager",
-      "title": "Yeonsudam Teacher Training Manager",
-      "description": "대한민국 초등교사를 위한 연도별 의무연수·개인연수 관리 웹앱",
-      "githubUrl": "https://github.com/Eunhorang/yeonsudam-teacher-training-manager",
-      "homepageUrl": "https://yeonsudam-teacher-training.rn-act.chatgpt.site/",
-      "hasPages": false,
-      "pagesUrl": null,
-      "liveUrl": "https://yeonsudam-teacher-training.rn-act.chatgpt.site/",
-      "language": "TypeScript",
-      "topics": [
-        "education",
-        "korean",
-        "nextjs",
-        "teacher-tools",
-        "teacher-training",
-        "training-management",
-        "typescript"
-      ],
-      "stars": 0,
-      "updatedAt": "2026-07-12T13:38:21Z",
+      "updatedAt": "2026-07-12T13:42:34Z",
       "archived": false,
       "fork": false
     },

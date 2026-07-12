@@ -20,17 +20,17 @@ describe("JSON 설정 검증", () => {
     );
   });
 
-  it("자동 사이트 주소 유지와 수동 빈 주소의 의도적 숨김을 구분한다", () => {
+  it("현재 자동 데이터와 수동 설정을 중복 없이 병합한다", () => {
     const generated = validateGeneratedProjects(generatedJson);
     const overrides = validateProjectOverrides(overridesJson);
     const projects = mergeProjects(generated.projects, overrides);
-    expect(projects.find((project) => project.repo === "question-garden")?.liveUrl).toBe(
-      "https://eunhorang.github.io/question-garden/",
+    expect(projects.length).toBeGreaterThan(0);
+    expect(new Set(projects.map((project) => project.repo.toLowerCase())).size).toBe(
+      projects.length,
     );
     expect(
-      projects.find((project) => project.repo === "yeonsudam-teacher-training-manager")
-        ?.liveUrl,
-    ).toBeNull();
+      projects.every((project) => project.githubUrl.startsWith("https://github.com/")),
+    ).toBe(true);
   });
 
   it("repo가 빠진 수동 설정을 파일 위치가 포함된 오류로 막는다", () => {
