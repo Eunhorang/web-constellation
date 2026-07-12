@@ -11,7 +11,9 @@ import { mergeProjects } from "../src/lib/projects";
 
 describe("JSON 설정 검증", () => {
   it("현재 사이트 설정과 프로젝트 데이터를 정상 데이터로 인정한다", () => {
-    expect(validateSiteConfig(siteConfigJson).siteName).toBe("은호랑의 웹 별자리");
+    const site = validateSiteConfig(siteConfigJson);
+    expect(site.siteName).toBe("은호랑의 웹 별자리");
+    expect(site.aboutNickname).toBe("은호랑");
     expect(validateProjectOverrides(overridesJson)).toHaveLength(overridesJson.length);
     expect(validateGeneratedProjects(generatedJson).projects).toHaveLength(
       generatedJson.projects.length,

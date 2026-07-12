@@ -10,7 +10,10 @@ export function About({ config }: { config: SiteConfig }) {
       <div className="about-panel">
         <div>
           <p className="eyebrow">ABOUT THE MAKER</p>
-          <h2 id="about-title">{config.aboutTitle}</h2>
+          <h2 id="about-title">
+            <span className="about-panel__title">{config.aboutTitle}</span>
+            <span className="about-panel__nickname">{config.aboutNickname}</span>
+          </h2>
         </div>
         <div className="about-panel__body">
           <p>{config.aboutText}</p>

@@ -1155,7 +1155,24 @@ main:focus-visible {
 }
 
 .about-panel h2 {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 0.15rem;
   margin-top: 0.7rem;
+}
+
+.about-panel__title,
+.about-panel__nickname {
+  white-space: nowrap;
+}
+
+.about-panel__nickname {
+  color: var(--sage-deep);
+  font-size: 0.62em;
+  font-weight: 680;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
 }
 
 .about-panel__body > p {

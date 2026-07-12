@@ -77,6 +77,7 @@ export interface SiteConfig {
   tagline: string;
   heroDescription: string;
   aboutTitle: string;
+  aboutNickname: string;
   aboutText: string;
   blogUrl: string;
   channelUrl: string;

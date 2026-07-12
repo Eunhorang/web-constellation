@@ -16,6 +16,7 @@ const site: SiteConfig = {
   tagline: "테스트 문구",
   heroDescription: "테스트 소개",
   aboutTitle: "만든 사람",
+  aboutNickname: "은호랑",
   aboutText: "테스트 소개",
   blogUrl: "",
   channelUrl: "",

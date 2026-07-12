@@ -113,6 +113,7 @@ src/data/site-config.json
 | `canonicalUrl` | 검색 엔진에 알려줄 최종 사이트 주소 |
 | `ogImage` | `public` 폴더에 있는 1200×630 공유 이미지 파일명 |
 | `tagline` | 히어로의 핵심 문구 |
+| `aboutNickname` | “만든 사람” 아래에 표시할 별명 |
 | `aboutText` | “만든 사람” 소개 문구 |
 | `blogUrl` | 비워 두면 블로그 링크가 숨겨짐 |
 | `channelUrl` | 비워 두면 다른 채널 링크가 숨겨짐 |
