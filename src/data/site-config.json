@@ -1,11 +1,13 @@
 {
   "siteName": "은호랑의 웹 별자리",
+  "pageTitle": "은호랑의 웹 별자리 | 이정주가 만든 웹사이트 모음",
   "englishLabel": "WEB CONSTELLATION · BY 이정주",
   "owner": "이정주",
   "githubUsername": "Eunhorang",
   "repository": "web-constellation",
   "email": "jjsy8587@gmail.com",
   "canonicalUrl": "https://eunhorang.github.io/web-constellation/",
+  "ogImage": "og-image-eunhorang.png",
   "description": "이정주가 만든 웹 프로젝트를 한눈에 탐색하고, 각 웹사이트와 GitHub 저장소로 이동할 수 있는 개인 웹 아카이브입니다.",
   "tagline": "내가 만든 웹들이 서로의 좌표가 되는 곳.",
   "heroDescription": "작은 아이디어에서 시작된 웹들을 한곳에 기록합니다.",

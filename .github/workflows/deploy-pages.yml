@@ -25,6 +25,14 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v7
 
+      - name: Restore last successful project cache
+        uses: actions/cache/restore@v5
+        with:
+          path: src/data/projects.generated.json
+          key: web-constellation-projects-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            web-constellation-projects-
+
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
@@ -67,6 +75,12 @@ jobs:
         run: npm run check:build
         env:
           GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Save successful project cache
+        uses: actions/cache/save@v5
+        with:
+          path: src/data/projects.generated.json
+          key: web-constellation-projects-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5

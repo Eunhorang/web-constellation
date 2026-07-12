@@ -27,12 +27,14 @@ web-constellation/
 │  └─ deploy-pages.yml          # GitHub Pages 자동 검사·배포
 ├─ public/
 │  ├─ favicon.svg               # 브라우저 탭 아이콘
-│  ├─ og-image.png              # 1200×630 공유 이미지
+│  ├─ og-image-eunhorang.png    # 1200×630 공유 이미지
+│  ├─ og-image.png              # 이전 공유 주소 호환용 사본
 │  ├─ robots.txt                # 검색 로봇 안내(빌드 시 갱신)
 │  └─ sitemap.xml               # 사이트맵(빌드 시 갱신)
 ├─ scripts/
 │  ├─ github-sync-core.mjs      # GitHub 수집·검증 핵심 기능
 │  ├─ sync-github.mjs           # 공개 저장소 동기화 실행 파일
+│  ├─ generate-og-image.mjs     # 사이트 공유 이미지 다시 만들기
 │  ├─ generate-seo.mjs          # robots.txt와 sitemap.xml 생성
 │  ├─ prepare-build.mjs         # 빌드 전 동기화와 SEO 준비
 │  └─ check-build-security.mjs  # 비공개 정보·토큰 노출 검사
@@ -42,7 +44,7 @@ web-constellation/
 │  │  ├─ project-overrides.json # 프로젝트 관리의 단일 원본
 │  │  ├─ projects.generated.json# GitHub에서 만든 마지막 정상 캐시
 │  │  └─ site-config.json       # 이름·소개·연락처 설정
-│  ├─ lib/                      # 병합·검색·정렬·좌표 계산
+│  ├─ lib/                      # 병합·검색·정렬·좌표 계산·JSON 검증
 │  ├─ types/                    # 데이터 형식 설명
 │  ├─ App.tsx                   # 한 페이지 전체 구성
 │  ├─ main.tsx                  # React 시작 파일
@@ -102,11 +104,14 @@ src/data/site-config.json
 
 | 항목 | 의미 |
 |---|---|
+| `siteName` | 화면에 표시되는 사이트 이름 |
+| `pageTitle` | 브라우저 탭과 검색·공유 제목 |
 | `owner` | 제작자 이름 |
 | `githubUsername` | 공개 저장소를 가져올 GitHub 사용자명 |
 | `repository` | 이 사이트를 배포할 저장소 이름 |
 | `email` | 화면에 표시할 연락 이메일 |
 | `canonicalUrl` | 검색 엔진에 알려줄 최종 사이트 주소 |
+| `ogImage` | `public` 폴더에 있는 1200×630 공유 이미지 파일명 |
 | `tagline` | 히어로의 핵심 문구 |
 | `aboutText` | “만든 사람” 소개 문구 |
 | `blogUrl` | 비워 두면 블로그 링크가 숨겨짐 |
@@ -243,6 +248,7 @@ npm run sync
 - fork와 archived 저장소는 기본적으로 제외합니다.
 - Pages 상세 API가 404여도 `has_pages` 기본 주소를 사용합니다.
 - API 장애나 요청 한도 초과가 발생하면 마지막 정상 `projects.generated.json`을 유지하고 빌드를 계속합니다.
+- GitHub Actions는 마지막 정상 JSON을 별도 캐시에 보관해 다음 예약 실행에서도 복원합니다.
 
 ## 8. 품질 검사와 프로덕션 빌드
 
@@ -277,6 +283,14 @@ npm run check:build
 ```
 
 생성 데이터에 비공개 저장소가 없는지, 배포 파일에 GitHub 토큰이 들어가지 않았는지 검사합니다.
+
+사이트 이름을 바꾸어 공유 이미지도 다시 만들어야 할 때만 다음 명령을 사용합니다. Mac에 ImageMagick이 설치되어 있어야 하며, 평소 사이트 실행에는 필요하지 않습니다.
+
+```bash
+npm run generate:og
+```
+
+`magick` 명령을 찾을 수 없다는 오류가 나오면 `brew install imagemagick`을 한 번 실행한 뒤 다시 시도합니다.
 
 ```bash
 npm run preview

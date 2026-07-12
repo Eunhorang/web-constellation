@@ -4,6 +4,7 @@ import {
   chooseGitHubUsername,
   collectGitHubData,
   fetchAllPublicRepositories,
+  isValidCache,
   parseOwnerFromRemote,
   resolveAutomaticLiveUrl,
 } from "../scripts/github-sync-core.mjs";
@@ -25,6 +26,49 @@ function repository(name, overrides = {}) {
     visibility: "public",
     ...overrides,
   };
+}
+
+function cachedProject(name, overrides = {}) {
+  return {
+    repo: name,
+    title: name,
+    description: `${name} description`,
+    githubUrl: `https://github.com/test/${name}`,
+    homepageUrl: null,
+    hasPages: false,
+    pagesUrl: null,
+    liveUrl: null,
+    language: null,
+    topics: [],
+    stars: 0,
+    updatedAt: "2026-07-01T00:00:00.000Z",
+    archived: false,
+    fork: false,
+    ...overrides,
+  };
+}
+
+function cacheWith(projects) {
+  return {
+    schemaVersion: 1,
+    githubUsername: "test",
+    generatedAt: "2026-07-01T00:00:00.000Z",
+    source: "github",
+    projects,
+  };
+}
+
+function hangingJsonResponse() {
+  const body = new ReadableStream({
+    start(controller) {
+      controller.enqueue(new TextEncoder().encode("["));
+      // 헤더는 받았지만 JSON 본문이 끝나지 않는 서버를 재현합니다.
+    },
+  });
+  return new Response(body, {
+    status: 200,
+    headers: { "content-type": "application/json" },
+  });
 }
 
 describe("GitHub 사용자명 확인", () => {
@@ -108,30 +152,7 @@ describe("GitHub 저장소 수집", () => {
   });
 
   it("GitHub API가 실패하면 마지막 정상 캐시를 그대로 사용한다", async () => {
-    const previousCache = {
-      schemaVersion: 1,
-      githubUsername: "test",
-      generatedAt: "2026-07-01T00:00:00.000Z",
-      source: "github",
-      projects: [
-        {
-          repo: "cached",
-          title: "Cached",
-          description: "cached description",
-          githubUrl: "https://github.com/test/cached",
-          homepageUrl: null,
-          hasPages: false,
-          pagesUrl: null,
-          liveUrl: null,
-          language: null,
-          topics: [],
-          stars: 0,
-          updatedAt: "2026-07-01T00:00:00.000Z",
-          archived: false,
-          fork: false,
-        },
-      ],
-    };
+    const previousCache = cacheWith([cachedProject("cached", { title: "Cached" })]);
     const warnings = [];
     const result = await collectGitHubData({
       username: "test",
@@ -142,10 +163,66 @@ describe("GitHub 저장소 수집", () => {
       onWarning: (message) => warnings.push(message),
     });
 
-    expect(result.data).toBe(previousCache);
+    expect(result.data).toEqual(previousCache);
     expect(result.usedCache).toBe(true);
     expect(result.shouldWrite).toBe(false);
     expect(warnings[0]).toContain("GitHub 동기화 실패");
+  });
+
+  it("응답이 멈춘 요청도 제한 시간이 지나면 캐시로 전환한다", async () => {
+    const previousCache = cacheWith([cachedProject("cached")]);
+    const result = await collectGitHubData({
+      username: "test",
+      previousCache,
+      repositoriesTimeoutMs: 10,
+      fetchImpl: async () => new Promise(() => {}),
+    });
+
+    expect(result.usedCache).toBe(true);
+    expect(result.data.projects[0].repo).toBe("cached");
+  });
+
+  it("JSON 본문이 끝나지 않아도 저장소 목록 요청을 중단하고 캐시를 쓴다", async () => {
+    const previousCache = cacheWith([cachedProject("cached")]);
+    const result = await collectGitHubData({
+      username: "test",
+      previousCache,
+      repositoriesTimeoutMs: 10,
+      fetchImpl: async () => hangingJsonResponse(),
+    });
+
+    expect(result.usedCache).toBe(true);
+    expect(result.data.projects[0].repo).toBe("cached");
+  });
+
+  it("Pages JSON 본문이 끝나지 않으면 기본 Pages 주소로 계속한다", async () => {
+    const warnings = [];
+    const fetchImpl = vi.fn(async (input) => {
+      const url = new URL(input);
+      if (url.pathname.endsWith("/pages")) return hangingJsonResponse();
+      return new Response(
+        JSON.stringify([repository("site", { has_pages: true })]),
+        { status: 200, headers: { "content-type": "application/json" } },
+      );
+    });
+
+    const result = await collectGitHubData({
+      username: "test",
+      fetchImpl,
+      apiBase: "https://api.example.com",
+      pagesTimeoutMs: 10,
+      onWarning: (message) => warnings.push(message),
+    });
+
+    expect(result.usedCache).toBe(false);
+    expect(result.data.projects[0].liveUrl).toBe("https://test.github.io/site/");
+    expect(warnings.join(" ")).toContain("Pages 상세 정보를 읽지 못해");
+  });
+
+  it("private 변형이나 임의 비밀 필드가 섞인 캐시는 거부한다", () => {
+    expect(isValidCache(cacheWith([cachedProject("one", { private: "true" })]), "test")).toBe(false);
+    expect(isValidCache(cacheWith([cachedProject("one", { visibility: "PRIVATE" })]), "test")).toBe(false);
+    expect(isValidCache(cacheWith([cachedProject("one", { secret: "do-not-publish" })]), "test")).toBe(false);
   });
 
   it("private 표시가 있는 기존 캐시는 API 실패 시 사용하지 않는다", async () => {

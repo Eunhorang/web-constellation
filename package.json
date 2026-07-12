@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "generate:og": "node scripts/generate-og-image.mjs",
     "generate:seo": "node --env-file-if-exists=.env.local scripts/generate-seo.mjs",
     "prebuild": "node scripts/prepare-build.mjs",
     "build": "vite build",

@@ -1,4 +1,20 @@
 const DEFAULT_API_BASE = "https://api.github.com";
+const CACHE_PROJECT_KEYS = new Set([
+  "repo",
+  "title",
+  "description",
+  "githubUrl",
+  "homepageUrl",
+  "hasPages",
+  "pagesUrl",
+  "liveUrl",
+  "language",
+  "topics",
+  "stars",
+  "updatedAt",
+  "archived",
+  "fork",
+]);
 
 export function isSafeHttpUrl(value) {
   if (typeof value !== "string" || value.trim() === "") return false;
@@ -139,6 +155,37 @@ function githubHeaders(token) {
   return headers;
 }
 
+async function fetchJsonWithTimeout(fetchImpl, input, options, timeoutMs, resource) {
+  const controller = new AbortController();
+  let response;
+  let timeoutId;
+  const timeout = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => {
+      controller.abort();
+      // AbortController와 연결되지 않은 테스트·대체 fetch의 본문도 가능하면 닫습니다.
+      // response.json()이 이미 스트림을 잠금한 경우의 실패는 요청 실패를 덮지 않게 무시합니다.
+      try {
+        const cancellation = response?.body?.cancel();
+        if (cancellation) void cancellation.catch(() => {});
+      } catch {
+        // 이미 response.json()이 잠금한 스트림은 AbortController로 중단합니다.
+      }
+      reject(new Error(`${resource} 요청 시간이 ${timeoutMs}ms를 초과했습니다.`));
+    }, timeoutMs);
+  });
+  const requestAndBody = (async () => {
+    response = await fetchImpl(input, { ...options, signal: controller.signal });
+    if (!response.ok) throw await responseError(response, resource);
+    return response.json();
+  })();
+
+  try {
+    return await Promise.race([requestAndBody, timeout]);
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 async function responseError(response, resource) {
   const remaining = response.headers?.get?.("x-ratelimit-remaining");
   const rateHint = remaining === "0" ? " (GitHub API 요청 한도 소진)" : "";
@@ -150,6 +197,7 @@ export async function fetchAllPublicRepositories({
   token,
   fetchImpl = globalThis.fetch,
   apiBase = DEFAULT_API_BASE,
+  timeoutMs = 15_000,
 }) {
   const repositories = [];
 
@@ -164,11 +212,13 @@ export async function fetchAllPublicRepositories({
     endpoint.searchParams.set("per_page", "100");
     endpoint.searchParams.set("page", String(page));
 
-    const response = await fetchImpl(endpoint, {
-      headers: githubHeaders(token),
-    });
-    if (!response.ok) throw await responseError(response, "공개 저장소 목록");
-    const pageItems = await response.json();
+    const pageItems = await fetchJsonWithTimeout(
+      fetchImpl,
+      endpoint,
+      { headers: githubHeaders(token) },
+      timeoutMs,
+      "공개 저장소 목록",
+    );
     if (!Array.isArray(pageItems)) {
       throw new Error("GitHub 공개 저장소 응답 형식이 올바르지 않습니다.");
     }
@@ -185,16 +235,19 @@ export async function fetchPagesUrl({
   token,
   fetchImpl = globalThis.fetch,
   apiBase = DEFAULT_API_BASE,
+  timeoutMs = 8_000,
 }) {
   const endpoint = new URL(
     `/repos/${encodeURIComponent(username)}/${encodeURIComponent(repositoryName)}/pages`,
     apiBase,
   );
-  const response = await fetchImpl(endpoint, {
-    headers: githubHeaders(token),
-  });
-  if (!response.ok) throw await responseError(response, `${repositoryName} Pages`);
-  const data = await response.json();
+  const data = await fetchJsonWithTimeout(
+    fetchImpl,
+    endpoint,
+    { headers: githubHeaders(token) },
+    timeoutMs,
+    `${repositoryName} Pages`,
+  );
   return normalizeUrl(data?.html_url);
 }
 
@@ -226,33 +279,104 @@ function emptyCache(username, now) {
   };
 }
 
-function isValidCachedProject(project) {
-  if (!project || typeof project !== "object") return false;
-  if (project.private === true || project.visibility === "private") return false;
-  if (typeof project.repo !== "string" || project.repo.trim() === "") return false;
-  if (typeof project.title !== "string" || typeof project.description !== "string") {
-    return false;
+function isNullableUrl(value) {
+  return value === null || isSafeHttpUrl(value);
+}
+
+function isExpectedGitHubUrl(value, username, repositoryName) {
+  if (!isSafeHttpUrl(value)) return false;
+  const url = new URL(value);
+  const parts = url.pathname.split("/").filter(Boolean);
+  return (
+    url.hostname.toLowerCase() === "github.com" &&
+    parts.length === 2 &&
+    parts[0].toLowerCase() === username.toLowerCase() &&
+    parts[1].replace(/\.git$/i, "").toLowerCase() === repositoryName.toLowerCase()
+  );
+}
+
+function sanitizeCachedProject(project, username) {
+  if (!project || typeof project !== "object" || Array.isArray(project)) return null;
+  if (Object.keys(project).some((key) => !CACHE_PROJECT_KEYS.has(key))) return null;
+  if (typeof project.repo !== "string" || project.repo.trim() === "") return null;
+  if (typeof project.title !== "string" || project.title.trim() === "") return null;
+  if (typeof project.description !== "string" || project.description.trim() === "") {
+    return null;
   }
-  if (!isSafeHttpUrl(project.githubUrl)) return false;
-  if (project.liveUrl !== null && !isSafeHttpUrl(project.liveUrl)) return false;
-  if (project.pagesUrl !== null && !isSafeHttpUrl(project.pagesUrl)) return false;
-  if (typeof project.updatedAt !== "string") return false;
+  if (!isExpectedGitHubUrl(project.githubUrl, username, project.repo)) return null;
+  if (!isNullableUrl(project.homepageUrl)) return null;
+  if (!isNullableUrl(project.liveUrl) || !isNullableUrl(project.pagesUrl)) return null;
+  if (typeof project.hasPages !== "boolean") return null;
+  if (project.language !== null && typeof project.language !== "string") return null;
+  if (!Array.isArray(project.topics) || project.topics.some((topic) => typeof topic !== "string")) {
+    return null;
+  }
+  if (!Number.isInteger(project.stars) || project.stars < 0) return null;
+  if (typeof project.updatedAt !== "string" || Number.isNaN(Date.parse(project.updatedAt))) {
+    return null;
+  }
   if (typeof project.archived !== "boolean" || typeof project.fork !== "boolean") {
-    return false;
+    return null;
   }
-  return true;
+
+  return {
+    repo: project.repo.trim(),
+    title: project.title.trim(),
+    description: project.description.trim(),
+    githubUrl: project.githubUrl.trim(),
+    homepageUrl: project.homepageUrl === null ? null : project.homepageUrl.trim(),
+    hasPages: project.hasPages,
+    pagesUrl: project.pagesUrl === null ? null : project.pagesUrl.trim(),
+    liveUrl: project.liveUrl === null ? null : project.liveUrl.trim(),
+    language: project.language === null ? null : project.language.trim(),
+    topics: project.topics.map((topic) => topic.trim()).filter(Boolean),
+    stars: project.stars,
+    updatedAt: project.updatedAt,
+    archived: project.archived,
+    fork: project.fork,
+  };
+}
+
+export function sanitizeCache(cache, username) {
+  if (!cache || typeof cache !== "object" || Array.isArray(cache)) return null;
+  if (
+    Object.keys(cache).some(
+      (key) => !["schemaVersion", "githubUsername", "generatedAt", "source", "projects"].includes(key),
+    )
+  ) {
+    return null;
+  }
+  if (cache.schemaVersion !== 1) return null;
+  if (
+    typeof cache.githubUsername !== "string" ||
+    cache.githubUsername.toLowerCase() !== username.toLowerCase()
+  ) {
+    return null;
+  }
+  if (typeof cache.generatedAt !== "string" || Number.isNaN(Date.parse(cache.generatedAt))) {
+    return null;
+  }
+  if (typeof cache.source !== "string" || !Array.isArray(cache.projects)) return null;
+  const projects = cache.projects.map((project) => sanitizeCachedProject(project, username));
+  if (projects.some((project) => project === null)) return null;
+  const repositories = new Set();
+  for (const project of projects) {
+    const key = project.repo.toLowerCase();
+    if (repositories.has(key)) return null;
+    repositories.add(key);
+  }
+
+  return {
+    schemaVersion: 1,
+    githubUsername: cache.githubUsername,
+    generatedAt: cache.generatedAt,
+    source: cache.source,
+    projects,
+  };
 }
 
 export function isValidCache(cache, username) {
-  return (
-    cache &&
-    cache.schemaVersion === 1 &&
-    typeof cache.githubUsername === "string" &&
-    cache.githubUsername.toLowerCase() === username.toLowerCase() &&
-    typeof cache.generatedAt === "string" &&
-    Array.isArray(cache.projects) &&
-    cache.projects.every(isValidCachedProject)
-  );
+  return sanitizeCache(cache, username) !== null;
 }
 
 export async function collectGitHubData({
@@ -262,12 +386,12 @@ export async function collectGitHubData({
   previousCache = null,
   fetchImpl = globalThis.fetch,
   apiBase = DEFAULT_API_BASE,
+  repositoriesTimeoutMs = 15_000,
+  pagesTimeoutMs = 8_000,
   now = new Date().toISOString(),
   onWarning = () => {},
 }) {
-  const safePreviousCache = isValidCache(previousCache, username)
-    ? previousCache
-    : null;
+  const safePreviousCache = sanitizeCache(previousCache, username);
   if (previousCache && !safePreviousCache) {
     onWarning("기존 캐시 검증에 실패해 안전한 빈 캐시로 대체합니다.");
   }
@@ -278,6 +402,7 @@ export async function collectGitHubData({
       token,
       fetchImpl,
       apiBase,
+      timeoutMs: repositoriesTimeoutMs,
     });
     const overrideByRepo = new Map(
       overrides.map((override) => [String(override.repo).toLowerCase(), override]),
@@ -305,6 +430,7 @@ export async function collectGitHubData({
             token,
             fetchImpl,
             apiBase,
+            timeoutMs: pagesTimeoutMs,
           });
         } catch (error) {
           pagesUrl = previousByRepo.get(String(repository.name).toLowerCase())?.pagesUrl;

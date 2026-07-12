@@ -4,45 +4,25 @@ import { fileURLToPath, URL } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv, type Plugin } from "vite";
-
-interface SiteConfig {
-  canonicalUrl: string;
-  githubUsername: string;
-  repository: string;
-  owner: string;
-  email: string;
-  siteName: string;
-  description: string;
-}
-
-interface GeneratedProject {
-  repo: string;
-  title: string;
-  description: string;
-  githubUrl: string;
-  liveUrl: string | null;
-}
-
-interface GeneratedData {
-  projects: GeneratedProject[];
-}
-
-interface ProjectOverride {
-  repo: string;
-  title?: string;
-  description?: string;
-  liveUrl?: string;
-  githubUrl?: string;
-  hidden?: boolean;
-  order?: number;
-}
+import {
+  validateGeneratedProjects,
+  validateProjectOverrides,
+  validateSiteConfig,
+} from "./src/lib/data-validation";
+import { mergeProjects } from "./src/lib/projects";
+import type { Project, SiteConfig } from "./src/types/project";
 
 const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
-function readJson<T>(relativePath: string): T {
-  return JSON.parse(
-    fs.readFileSync(path.join(projectRoot, relativePath), "utf8"),
-  ) as T;
+function readJson(relativePath: string): unknown {
+  try {
+    return JSON.parse(
+      fs.readFileSync(path.join(projectRoot, relativePath), "utf8"),
+    ) as unknown;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`[데이터 설정 오류] ${relativePath}을(를) 읽을 수 없습니다: ${message}`);
+  }
 }
 
 export function normalizeBasePath(value: string): string {
@@ -53,7 +33,7 @@ export function normalizeBasePath(value: string): string {
 export function resolveDeployment(
   command: "build" | "serve",
   env: Record<string, string>,
-  site: SiteConfig,
+  site: Pick<SiteConfig, "canonicalUrl" | "githubUsername" | "repository">,
   isPreview: boolean,
 ) {
   if (command === "serve" && !isPreview) {
@@ -72,105 +52,108 @@ export function resolveDeployment(
     : customDomain || repository.toLowerCase() === `${username}.github.io`.toLowerCase()
       ? "/"
       : normalizeBasePath(repository);
-  const configuredUrl = env.SITE_URL?.trim() || site.canonicalUrl;
-  const siteUrl = configuredUrl.endsWith("/")
-    ? configuredUrl
-    : `${configuredUrl}/`;
+  const customDomainUrl = customDomain
+    ? normalizeSiteUrl(
+        /^https?:\/\//i.test(customDomain)
+          ? customDomain
+          : `https://${customDomain}`,
+        "CUSTOM_DOMAIN",
+        true,
+      )
+    : null;
+  const configuredUrl = env.SITE_URL?.trim() || customDomainUrl || site.canonicalUrl;
+  const siteUrl = normalizeSiteUrl(configuredUrl, "SITE_URL");
 
   return { base, siteUrl };
+}
+
+function normalizeSiteUrl(value: string, label: string, rootOnly = false): string {
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "http:" && url.protocol !== "https:") {
+      throw new Error("http 또는 https 주소가 아닙니다.");
+    }
+    if (url.username || url.password || url.search || url.hash) {
+      throw new Error("사용자 정보, 검색어 또는 # 조각을 포함할 수 없습니다.");
+    }
+    if (rootOnly && url.pathname !== "/") {
+      throw new Error("도메인에는 하위 경로를 넣지 마세요.");
+    }
+    return url.href.endsWith("/") ? url.href : `${url.href}/`;
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    throw new Error(`[배포 설정 오류] ${label} 값 '${value}'이(가) 올바르지 않습니다: ${reason}`);
+  }
 }
 
 function safeJsonForHtml(value: unknown): string {
   return JSON.stringify(value).replaceAll("<", "\\u003c");
 }
 
-function safeHttpUrl(value: unknown): string | null {
-  if (typeof value !== "string" || !value.trim()) return null;
-  try {
-    const url = new URL(value.trim());
-    return url.protocol === "http:" || url.protocol === "https:"
-      ? value.trim()
-      : null;
-  } catch {
-    return null;
-  }
+function escapeHtml(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
-function projectsForMetadata(
-  generated: GeneratedProject[],
-  overrides: ProjectOverride[],
-) {
-  const overrideByRepo = new Map(
-    overrides.map((override) => [override.repo.toLowerCase(), override]),
-  );
-  return generated
-    .map((project) => {
-      const override = overrideByRepo.get(project.repo.toLowerCase());
-      if (override?.hidden) return null;
-      const hasManualLiveUrl =
-        override !== undefined &&
-        Object.prototype.hasOwnProperty.call(override, "liveUrl");
-      return {
-        repo: project.repo,
-        title: override?.title?.trim() || project.title,
-        description: override?.description?.trim() || project.description,
-        githubUrl: safeHttpUrl(override?.githubUrl) || project.githubUrl,
-        liveUrl: hasManualLiveUrl
-          ? safeHttpUrl(override.liveUrl)
-          : safeHttpUrl(project.liveUrl),
-        order:
-          typeof override?.order === "number" && Number.isFinite(override.order)
-            ? override.order
-            : 999,
-      };
-    })
-    .filter((project): project is NonNullable<typeof project> => project !== null)
-    .sort((a, b) => a.order - b.order || a.title.localeCompare(b.title, "ko"));
+export function renderMetadataHtml(
+  html: string,
+  siteUrl: string,
+  site: SiteConfig,
+  projects: Project[],
+): string {
+  const graph = [
+    {
+      "@type": "Person",
+      "@id": `${siteUrl}#person`,
+      name: site.owner,
+      url: siteUrl,
+      email: `mailto:${site.email}`,
+      sameAs: [`https://github.com/${site.githubUsername}`],
+    },
+    {
+      "@type": "ItemList",
+      "@id": `${siteUrl}#projects`,
+      name: `${site.owner}의 웹 프로젝트`,
+      itemListElement: projects.map((project, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: project.title,
+        description: project.description,
+        url: project.liveUrl || project.githubUrl,
+      })),
+    },
+  ];
+  const structuredData = safeJsonForHtml({
+    "@context": "https://schema.org",
+    "@graph": graph,
+  });
+  const ogImageUrl = new URL(site.ogImage, siteUrl).href;
+
+  return html
+    .replaceAll("__SITE_URL__", escapeHtml(siteUrl))
+    .replaceAll("__SITE_NAME__", escapeHtml(site.siteName))
+    .replaceAll("__PAGE_TITLE__", escapeHtml(site.pageTitle))
+    .replaceAll("__SITE_DESCRIPTION__", escapeHtml(site.description))
+    .replaceAll("__OG_IMAGE_URL__", escapeHtml(ogImageUrl))
+    .replace("__STRUCTURED_DATA__", structuredData);
 }
 
 function metadataPlugin(siteUrl: string, site: SiteConfig): Plugin {
   return {
     name: "web-constellation-metadata",
     transformIndexHtml(html) {
-      const generated = readJson<GeneratedData>(
-        "src/data/projects.generated.json",
+      const generated = validateGeneratedProjects(
+        readJson("src/data/projects.generated.json"),
       );
-      const overrides = readJson<ProjectOverride[]>(
-        "src/data/project-overrides.json",
+      const overrides = validateProjectOverrides(
+        readJson("src/data/project-overrides.json"),
       );
-      const projects = projectsForMetadata(generated.projects, overrides);
-      const graph = [
-        {
-          "@type": "Person",
-          "@id": `${siteUrl}#person`,
-          name: site.owner,
-          url: siteUrl,
-          email: `mailto:${site.email}`,
-          sameAs: [`https://github.com/${site.githubUsername}`],
-        },
-        {
-          "@type": "ItemList",
-          "@id": `${siteUrl}#projects`,
-          name: `${site.owner}의 웹 프로젝트`,
-          itemListElement: projects.map((project, index) => ({
-            "@type": "ListItem",
-            position: index + 1,
-            name: project.title,
-            description: project.description,
-            url: project.liveUrl || project.githubUrl,
-          })),
-        },
-      ];
-      const structuredData = safeJsonForHtml({
-        "@context": "https://schema.org",
-        "@graph": graph,
-      });
-
-      return html
-        .replaceAll("__SITE_URL__", siteUrl)
-        .replaceAll("__SITE_NAME__", site.siteName)
-        .replaceAll("__SITE_DESCRIPTION__", site.description)
-        .replace("__STRUCTURED_DATA__", structuredData);
+      const projects = mergeProjects(generated.projects, overrides);
+      return renderMetadataHtml(html, siteUrl, site, projects);
     },
   };
 }
@@ -181,7 +164,13 @@ export default defineConfig(({ command, mode, isPreview }) => {
     "GITHUB_USERNAME",
     "CUSTOM_DOMAIN",
   ]);
-  const site = readJson<SiteConfig>("src/data/site-config.json");
+  const site = validateSiteConfig(readJson("src/data/site-config.json"));
+  const ogImagePath = path.join(projectRoot, "public", site.ogImage);
+  if (!fs.existsSync(ogImagePath)) {
+    throw new Error(
+      `[데이터 설정 오류] site-config.json.ogImage: public/${site.ogImage} 파일이 없습니다.`,
+    );
+  }
   const deployment = resolveDeployment(command, env, site, isPreview === true);
 
   return {

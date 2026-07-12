@@ -22,6 +22,7 @@ Next.js, 서버 데이터베이스, 로그인형 관리자, Cloudflare Worker를
 
 ```bash
 npm run sync
+npm run generate:og
 npm run dev
 npm run lint
 npm run typecheck
@@ -46,6 +47,7 @@ npm run check:build
 ## project-overrides.json 관리 규칙
 
 - `src/data/project-overrides.json`이 사람이 편집하는 프로젝트 관리의 단일 원본이다.
+- JSON 설정은 `src/lib/data-validation.ts` 검증을 통과해야 하며 알 수 없는 필드나 중복 `repo`를 허용하지 않는다.
 - `src/data/projects.generated.json`은 직접 편집하지 않는다.
 - 수동 설정이 자동값보다 우선한다.
 - `hidden: true`는 모든 화면과 구조화 데이터에서 제외한다.
@@ -66,6 +68,7 @@ npm run check:build
 
 - 배경 `#F4F2EC`, 표면 `#FAF9F5`, 글자 `#202522`, 포인트 `#66766A` 중심의 밝고 차분한 종이 기반 디자인을 유지한다.
 - `Pretendard Variable`의 dynamic subset을 실제 로드하며 제목·본문·UI를 동일한 현대적 산세리프 체계로 유지한다. 별도 요청 없이 운영체제 의존 명조체로 되돌리지 않는다.
+- 사이트 이름을 바꾸면 `site-config.json`의 `pageTitle`과 `ogImage`도 함께 확인하고 1200×630 공유 이미지를 다시 만든다.
 - 본문 최소 크기는 16px, 카드 반경은 12~18px를 유지한다.
 - 무거운 그라데이션, 네온, 과도한 glassmorphism, 전체 화면 입자 애니메이션을 금지한다.
 - 새로운 색은 카드 전체가 아니라 작은 노드·선·표식에 절제해 사용한다.

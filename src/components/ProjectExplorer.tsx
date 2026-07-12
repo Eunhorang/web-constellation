@@ -71,6 +71,16 @@ function isTypingTarget(target: EventTarget | null): boolean {
   );
 }
 
+function resultAnnouncement(filters: ProjectFilters, resultCount: number): string {
+  const context: string[] = [];
+  if (filters.query.trim()) context.push(`“${filters.query.trim()}” 검색`);
+  if (filters.status !== "all") context.push(STATUS_LABELS[filters.status]);
+  if (filters.category !== "all") context.push(`${filters.category} 분류`);
+  if (filters.tag !== "all") context.push(`${filters.tag} 태그`);
+  context.push(SORT_LABELS[filters.sort]);
+  return `${context.join(", ")}: ${resultCount}개 프로젝트`;
+}
+
 export function ProjectExplorer({ projects }: { projects: Project[] }) {
   const [filters, setFilters] = useState<ProjectFilters>(() =>
     filtersFromUrl(projects),
@@ -88,6 +98,10 @@ export function ProjectExplorer({ projects }: { projects: Project[] }) {
   const results = useMemo(
     () => filterProjects(projects, filters),
     [projects, filters],
+  );
+  const announcement = useMemo(
+    () => resultAnnouncement(filters, results.length),
+    [filters, results.length],
   );
   const isFiltered =
     filters.query !== "" ||
@@ -138,7 +152,15 @@ export function ProjectExplorer({ projects }: { projects: Project[] }) {
         searchRef.current?.focus();
         searchRef.current?.select();
       }
-      if (event.key === "Escape" && filters.query) {
+      const canClearSearch =
+        event.target === searchRef.current || !isTypingTarget(event.target);
+      if (
+        event.key === "Escape" &&
+        filters.query &&
+        !event.defaultPrevented &&
+        canClearSearch
+      ) {
+        event.preventDefault();
         setFilters((current) => ({ ...current, query: "" }));
         searchRef.current?.focus();
       }
@@ -251,8 +273,11 @@ export function ProjectExplorer({ projects }: { projects: Project[] }) {
       </form>
 
       <div className="explorer-summary">
-        <p role="status" aria-live="polite" aria-atomic="true">
+        <p aria-hidden="true">
           <strong>{results.length}</strong>개의 프로젝트를 찾았습니다.
+        </p>
+        <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {announcement}
         </p>
         <button
           type="button"

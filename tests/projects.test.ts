@@ -3,6 +3,8 @@ import {
   filterProjects,
   getFeaturedProjects,
   mergeProjects,
+  projectElementId,
+  sortProjects,
 } from "../src/lib/projects";
 import type {
   AutoProject,
@@ -128,7 +130,14 @@ describe("프로젝트 자동 데이터와 수동 설정 병합", () => {
 
 describe("프로젝트 탐색", () => {
   const projects = mergeProjects(
-    [automaticProject("math-tool"), automaticProject("writing-note")],
+    [
+      automaticProject("math-tool", {
+        updatedAt: "2026-06-01T00:00:00.000Z",
+      }),
+      automaticProject("writing-note", {
+        updatedAt: "2026-07-01T00:00:00.000Z",
+      }),
+    ],
     [
       {
         repo: "math-tool",
@@ -176,5 +185,25 @@ describe("프로젝트 탐색", () => {
         (project) => project.repo,
       ),
     ).toEqual(["math-tool"]);
+  });
+
+  it("분류 필터와 이름·최근 업데이트 정렬을 적용한다", () => {
+    expect(
+      filterProjects(projects, { ...allFilters, category: "교육" }).map(
+        (project) => project.repo,
+      ),
+    ).toEqual(["math-tool"]);
+    expect(sortProjects(projects, "name").map((project) => project.title)).toEqual([
+      "글쓰기 노트",
+      "수학 학습지",
+    ]);
+    expect(
+      sortProjects(projects, "updated").map((project) => project.repo),
+    ).toEqual(["writing-note", "math-tool"]);
+  });
+
+  it("비슷한 저장소 이름도 서로 다른 DOM id를 만든다", () => {
+    const ids = ["a.b", "a-b", "a_b"].map(projectElementId);
+    expect(new Set(ids).size).toBe(3);
   });
 });

@@ -5,7 +5,7 @@ import type {
   ProjectOverride,
   ProjectSort,
   ProjectStatus,
-} from "@/types/project";
+} from "../types/project";
 
 const DEFAULT_ACCENTS = ["#66766a", "#8a6d55", "#718294", "#7a6f86"];
 const VALID_STATUSES = new Set<ProjectStatus>([
@@ -117,9 +117,7 @@ export function mergeProjects(
       if (automatic.archived && override?.status !== "archived") return null;
       if (override?.hidden === true) return null;
 
-      const hasManualLiveUrl =
-        override !== undefined &&
-        Object.prototype.hasOwnProperty.call(override, "liveUrl");
+      const hasManualLiveUrl = override?.liveUrl !== undefined;
       const liveUrl = hasManualLiveUrl
         ? safeUrlOrNull(override.liveUrl)
         : safeUrlOrNull(automatic.liveUrl);
@@ -233,8 +231,12 @@ export function uniqueValues(values: string[]): string[] {
   );
 }
 
+export function projectIdToken(repo: string): string {
+  return encodeURIComponent(repo.trim().toLocaleLowerCase("en-US"));
+}
+
 export function projectElementId(repo: string): string {
-  return `project-${repo.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+  return `project-${projectIdToken(repo)}`;
 }
 
 export function formatKoreanDate(value: string): string {

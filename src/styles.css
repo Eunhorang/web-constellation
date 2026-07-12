@@ -70,7 +70,7 @@ button,
 a,
 input,
 select {
-  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: rgb(70 85 74 / 18%);
 }
 
 button {
@@ -100,6 +100,11 @@ svg {
 
 main:focus {
   outline: none;
+}
+
+main:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: -2px;
 }
 
 .site-shell {
@@ -325,6 +330,8 @@ main:focus {
 
 .hero__lead span {
   color: var(--muted);
+  text-wrap: pretty;
+  word-break: keep-all;
 }
 
 .hero__actions {
@@ -487,7 +494,7 @@ main:focus {
 
 .hero-stats dt {
   color: var(--muted);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 650;
 }
 
@@ -504,7 +511,7 @@ main:focus {
 .hero-stats dd span {
   margin-left: 0.14rem;
   font-family: var(--font-sans);
-  font-size: 0.76rem;
+  font-size: 0.8125rem;
   font-weight: 650;
 }
 
@@ -797,7 +804,7 @@ main:focus {
   gap: 0.4rem;
   padding: 0.18rem 0.62rem;
   border-radius: 999px;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 750;
   line-height: 1.2;
   white-space: nowrap;
@@ -834,7 +841,7 @@ main:focus {
   min-width: 0;
   overflow: hidden;
   color: var(--muted);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 650;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -880,7 +887,7 @@ main:focus {
   border: 1px solid var(--line);
   border-radius: 999px;
   color: #59625d;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 620;
   line-height: 1.35;
   overflow-wrap: anywhere;
@@ -961,7 +968,7 @@ main:focus {
   display: block;
   margin: 0 0 0.4rem 0.15rem;
   color: #59625d;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 720;
 }
 
@@ -988,7 +995,6 @@ main:focus {
   min-height: 3rem;
   border: 1px solid var(--line);
   border-radius: var(--radius-small);
-  outline: none;
   background: var(--surface-strong);
   color: var(--ink);
   font-size: 1rem;
@@ -1000,13 +1006,19 @@ main:focus {
 }
 
 .search-input input::placeholder {
-  color: #8a918d;
+  color: var(--muted);
 }
 
 .search-input input:focus,
 .select-wrap select:focus {
   border-color: var(--sage);
   box-shadow: 0 0 0 3px rgb(102 118 106 / 13%);
+}
+
+.search-input input:focus-visible,
+.select-wrap select:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 2px;
 }
 
 .search-input kbd {
@@ -1208,7 +1220,7 @@ main:focus {
 .site-footer__note {
   margin-top: 0.25rem;
   color: var(--muted);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   letter-spacing: 0.04em;
 }
 
@@ -1219,7 +1231,7 @@ main:focus {
   justify-content: flex-end;
   gap: 0.75rem 1.25rem;
   color: var(--muted);
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
 }
 
 .site-footer__meta a {

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { MouseEventHandler, ReactNode } from "react";
 import { ExternalArrowIcon } from "./Icons";
 import { STATUS_LABELS } from "@/lib/projects";
 import type { ProjectStatus } from "@/types/project";
@@ -9,6 +9,7 @@ interface ExternalLinkProps {
   className?: string;
   ariaLabel?: string;
   showArrow?: boolean;
+  onClick?: MouseEventHandler<HTMLAnchorElement>;
 }
 
 export function ExternalLink({
@@ -17,6 +18,7 @@ export function ExternalLink({
   className,
   ariaLabel,
   showArrow = true,
+  onClick,
 }: ExternalLinkProps) {
   return (
     <a
@@ -24,7 +26,8 @@ export function ExternalLink({
       target="_blank"
       rel="noopener noreferrer"
       className={className}
-      aria-label={ariaLabel}
+      aria-label={ariaLabel ? `${ariaLabel} (새 탭에서 열림)` : undefined}
+      onClick={onClick}
     >
       {children}
       {showArrow ? <ExternalArrowIcon className="link-icon" /> : null}

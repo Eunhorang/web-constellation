@@ -9,16 +9,16 @@ import { SiteHeader } from "./components/SiteHeader";
 import generatedJson from "./data/projects.generated.json";
 import overridesJson from "./data/project-overrides.json";
 import siteConfigJson from "./data/site-config.json";
+import {
+  validateGeneratedProjects,
+  validateProjectOverrides,
+  validateSiteConfig,
+} from "./lib/data-validation";
 import { getFeaturedProjects, mergeProjects } from "./lib/projects";
-import type {
-  GeneratedProjects,
-  ProjectOverride,
-  SiteConfig,
-} from "./types/project";
 
-const generated = generatedJson as GeneratedProjects;
-const overrides = overridesJson as ProjectOverride[];
-const siteConfig = siteConfigJson as SiteConfig;
+const generated = validateGeneratedProjects(generatedJson);
+const overrides = validateProjectOverrides(overridesJson);
+const siteConfig = validateSiteConfig(siteConfigJson);
 
 export default function App() {
   const projects = mergeProjects(generated.projects, overrides);

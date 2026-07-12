@@ -65,12 +65,14 @@ export interface GeneratedProjects {
 
 export interface SiteConfig {
   siteName: string;
+  pageTitle: string;
   englishLabel: string;
   owner: string;
   githubUsername: string;
   repository: string;
   email: string;
   canonicalUrl: string;
+  ogImage: string;
   description: string;
   tagline: string;
   heroDescription: string;

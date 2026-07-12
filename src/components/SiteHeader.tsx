@@ -22,6 +22,8 @@ export function SiteHeader({ siteName, githubUrl }: SiteHeaderProps) {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && menuOpen) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
         setMenuOpen(false);
         menuButtonRef.current?.focus();
       }
@@ -63,7 +65,9 @@ export function SiteHeader({ siteName, githubUrl }: SiteHeaderProps) {
           <a href="#projects" onClick={closeMenu}>프로젝트</a>
           <a href="#map" onClick={closeMenu}>지도</a>
           <a href="#about" onClick={closeMenu}>소개</a>
-          <ExternalLink href={githubUrl} className="nav-github">GitHub</ExternalLink>
+          <ExternalLink href={githubUrl} className="nav-github" onClick={closeMenu}>
+            GitHub
+          </ExternalLink>
         </nav>
       </div>
     </header>

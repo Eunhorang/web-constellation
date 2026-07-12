@@ -110,5 +110,19 @@
     "accent": "#7b7064",
     "launchedAt": "2026-07-12",
     "note": "공개 저장소는 있으나 배포 사이트가 없어 준비 중으로 표시합니다."
+  },
+  {
+    "repo": "question-garden",
+    "title": "질문의 정원",
+    "description": "하루 한 가지 인문학 질문을 만나고 생각을 천천히 확장할 수 있도록 만든 한국어 웹앱입니다.",
+    "category": "인문학·글쓰기",
+    "status": "live",
+    "tags": ["인문학", "질문", "글쓰기", "Astro"],
+    "featured": false,
+    "hidden": false,
+    "order": 9,
+    "accent": "#7c7163",
+    "launchedAt": "2026-07-12",
+    "note": "GitHub Pages로 공개된 새 웹사이트입니다."
   }
 ]

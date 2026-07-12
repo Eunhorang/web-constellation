@@ -2,7 +2,7 @@ import { useMemo, type CSSProperties } from "react";
 import { SectionHeading } from "./Common";
 import { buildConstellation } from "@/lib/constellation";
 import { requestProjectCard } from "@/lib/project-navigation";
-import { STATUS_LABELS } from "@/lib/projects";
+import { projectIdToken, STATUS_LABELS } from "@/lib/projects";
 import type { Project } from "@/types/project";
 
 export function ConstellationMap({ projects }: { projects: Project[] }) {
@@ -45,9 +45,7 @@ export function ConstellationMap({ projects }: { projects: Project[] }) {
 
         <ol className="constellation__nodes" aria-label="별자리 프로젝트 목록">
           {constellation.nodes.map((node, index) => {
-            const tooltipId = `constellation-tooltip-${node.project.repo
-              .toLowerCase()
-              .replace(/[^a-z0-9]+/g, "-")}`;
+            const tooltipId = `constellation-tooltip-${projectIdToken(node.project.repo)}`;
             return (
             <li
               key={node.project.repo}
