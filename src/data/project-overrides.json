@@ -153,5 +153,20 @@
     "accent": "#3f7068",
     "launchedAt": "2026-07-13",
     "note": "GitHub Pages로 공개된 초보 투자 금융문해력 학습 웹사이트입니다."
+  },
+  {
+    "repo": "teumsae-playground",
+    "title": "틈새 놀이터",
+    "description": "초등학생이 자투리 시간에 게임·그림·퍼즐·코딩·음악 활동을 골라 즐길 수 있는 태블릿 활동 모음입니다.",
+    "liveUrl": "https://eunhorang.github.io/teumsae-playground/",
+    "category": "교육",
+    "status": "live",
+    "tags": ["교실 활동", "태블릿", "놀이", "TypeScript"],
+    "featured": false,
+    "hidden": false,
+    "order": 12,
+    "accent": "#6d7d65",
+    "launchedAt": "2026-07-22",
+    "note": "GitHub Pages로 공개된 초등학생 자투리 시간용 태블릿 활동 모음입니다."
   }
 ]
