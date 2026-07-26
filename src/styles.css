@@ -17,6 +17,7 @@
   --radius-small: 12px;
   --radius: 16px;
   --radius-large: 18px;
+  --header-height: 4.5rem;
   --section-space: clamp(4.75rem, 8vw, 8rem);
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
   --font-display: var(--font-sans);
@@ -1079,6 +1080,16 @@ main:focus-visible {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: rgb(250 249 245 / 78%);
+}
+
+/* 데스크톱에서만 필터 패널을 헤더 바로 아래에 고정한다. */
+@media (min-width: 48rem) {
+  .filter-panel {
+    position: sticky;
+    top: calc(var(--header-height) + 0.85rem);
+    z-index: 40;
+    background: rgb(250 249 245 / 94%);
+  }
 }
 
 .filter-field {
