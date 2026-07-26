@@ -42,7 +42,7 @@
 ### 2. 대표 프로젝트 비대칭 그리드
 
 - 현재 `.project-grid--featured`는 균등 3열이다. 첫 번째(대표) 카드를 2배 폭 또는 2배 높이로 키우는 bento 스타일로 변경한다.
-- 데스크톱(≥56rem)에서만 비대칭을 적용하고, 그 아래에서는 기존 반응형 규칙(2열 → 1열)을 그대로 따른다.
+- 데스크톱(≥56rem)에서만 비대칭을 적용하고, 그 아래에서는 기존 반응형 규칙(2열 → 1열)을 그대로 따른다. 실제 구현에서는 기존 `max-width: 56rem` 규칙과 겹치지 않도록 `min-width: 56.01rem`을 기준으로 삼는다.
 - 데이터/컴포넌트 구조는 변경하지 않는다. CSS grid 배치만 바꾼다.
 
 ### 3. 프로젝트 카드 인덱스 번호 & accent 언더라인
@@ -57,7 +57,7 @@
 
 ### 5. 별자리 지도 — 선 그리기 애니메이션
 
-- `constellation__lines`의 각 `<line>`에 `stroke-dasharray`/`stroke-dashoffset`을 이용한 CSS 애니메이션을 적용해, 섹션이 처음 뷰포트에 들어올 때 선이 순서대로 "그려지는" 효과를 준다.
+- `constellation__lines`의 각 `<line>`에 `stroke-dasharray`/`stroke-dashoffset`을 이용한 CSS 애니메이션을 적용해, 섹션이 처음 뷰포트에 들어올 때 선이 순서대로 "그려지는" 효과를 준다. (구현 결정: 이 선들은 이미 `stroke-dasharray: 3 5`로 점선 질감을 내고 있고, `preserveAspectRatio="none"`으로 비율이 왜곡되는 SVG라 `stroke-dashoffset` 기반의 "그려지는" 효과를 적용하면 기존 점선 패턴이 깨진다. 대신 각 선에 인덱스 기반 `animation-delay`를 주는 순차 **페이드인**(opacity 0→1)으로 구현해 점선 질감을 그대로 유지했다.)
 - IntersectionObserver로 섹션 진입을 감지해 1회만 트리거한다 (재트리거 없음, 성능 보호).
 - `prefers-reduced-motion: reduce`에서는 애니메이션 없이 즉시 완성된 상태로 렌더링한다 (기존 미디어쿼리 규칙에 편입).
 - 모바일에서는 어차피 선이 숨겨져 있으므로(`constellation__lines { display: none }`) 영향 없음.
