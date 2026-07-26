@@ -1,9 +1,135 @@
 {
   "schemaVersion": 1,
   "githubUsername": "Eunhorang",
-  "generatedAt": "2026-07-13T14:38:25.943Z",
+  "generatedAt": "2026-07-26T14:41:08.707Z",
   "source": "github",
   "projects": [
+    {
+      "repo": "lee-jeongju-writer-portfolio",
+      "title": "Lee Jeongju Writer Portfolio",
+      "description": "이정주 작가 포트폴리오 — 말과 마음 사이",
+      "githubUrl": "https://github.com/Eunhorang/lee-jeongju-writer-portfolio",
+      "homepageUrl": null,
+      "hasPages": true,
+      "pagesUrl": "https://eunhorang.github.io/lee-jeongju-writer-portfolio/",
+      "liveUrl": "https://eunhorang.github.io/lee-jeongju-writer-portfolio/",
+      "language": "CSS",
+      "topics": [],
+      "stars": 0,
+      "updatedAt": "2026-07-25T15:09:40Z",
+      "archived": false,
+      "fork": false,
+      "updateHistory": [
+        {
+          "date": "2026-07-25T15:09:40Z",
+          "summary": "GitHub 저장소에 새 코드가 반영되었습니다."
+        },
+        {
+          "date": "2026-07-18T13:34:08Z",
+          "summary": "GitHub 저장소에 새 코드가 반영되었습니다."
+        },
+        {
+          "date": "2026-07-11T06:46:52Z",
+          "summary": "업데이트 기록 수집을 시작한 코드 기준입니다."
+        }
+      ]
+    },
+    {
+      "repo": "classroom-one-page",
+      "title": "Classroom One Page",
+      "description": "초등학교 교사를 위한 A4 한 장 수업 자료 제작 도구",
+      "githubUrl": "https://github.com/Eunhorang/classroom-one-page",
+      "homepageUrl": "https://eunhorang.github.io/classroom-one-page/",
+      "hasPages": true,
+      "pagesUrl": null,
+      "liveUrl": "https://eunhorang.github.io/classroom-one-page/",
+      "language": "TypeScript",
+      "topics": [],
+      "stars": 0,
+      "updatedAt": "2026-07-25T14:24:51Z",
+      "archived": false,
+      "fork": false,
+      "updateHistory": [
+        {
+          "date": "2026-07-25T14:24:51Z",
+          "summary": "새 웹사이트가 공개 프로젝트 목록에 등록되었습니다."
+        }
+      ]
+    },
+    {
+      "repo": "web-constellation",
+      "title": "Web Constellation",
+      "description": "이정주가 만든 웹 프로젝트를 한곳에 모은 개인 웹 아카이브",
+      "githubUrl": "https://github.com/Eunhorang/web-constellation",
+      "homepageUrl": "https://eunhorang.github.io/web-constellation/",
+      "hasPages": true,
+      "pagesUrl": "https://eunhorang.github.io/web-constellation/",
+      "liveUrl": "https://eunhorang.github.io/web-constellation/",
+      "language": "TypeScript",
+      "topics": [],
+      "stars": 0,
+      "updatedAt": "2026-07-22T14:22:21Z",
+      "archived": false,
+      "fork": false,
+      "updateHistory": [
+        {
+          "date": "2026-07-22T14:22:21Z",
+          "summary": "GitHub 저장소에 새 코드가 반영되었습니다."
+        },
+        {
+          "date": "2026-07-13T14:40:37Z",
+          "summary": "업데이트 기록 수집을 시작한 코드 기준입니다."
+        }
+      ]
+    },
+    {
+      "repo": "Eunhorang.github.io",
+      "title": "Eunhorang.Github.Io",
+      "description": "이은호 축구 포트폴리오 GitHub Pages 공개 배포 저장소",
+      "githubUrl": "https://github.com/Eunhorang/Eunhorang.github.io",
+      "homepageUrl": null,
+      "hasPages": true,
+      "pagesUrl": "https://eunhorang.github.io/",
+      "liveUrl": "https://eunhorang.github.io/",
+      "language": "HTML",
+      "topics": [],
+      "stars": 0,
+      "updatedAt": "2026-07-22T10:26:38Z",
+      "archived": false,
+      "fork": false,
+      "updateHistory": [
+        {
+          "date": "2026-07-22T10:26:38Z",
+          "summary": "GitHub 저장소에 새 코드가 반영되었습니다."
+        },
+        {
+          "date": "2026-07-12T23:33:24Z",
+          "summary": "업데이트 기록 수집을 시작한 코드 기준입니다."
+        }
+      ]
+    },
+    {
+      "repo": "teumsae-playground",
+      "title": "Teumsae Playground",
+      "description": "초등학생 자투리 시간용 태블릿 활동 모음",
+      "githubUrl": "https://github.com/Eunhorang/teumsae-playground",
+      "homepageUrl": null,
+      "hasPages": true,
+      "pagesUrl": null,
+      "liveUrl": "https://eunhorang.github.io/teumsae-playground/",
+      "language": "TypeScript",
+      "topics": [],
+      "stars": 0,
+      "updatedAt": "2026-07-22T08:55:04Z",
+      "archived": false,
+      "fork": false,
+      "updateHistory": [
+        {
+          "date": "2026-07-22T08:55:04Z",
+          "summary": "새 웹사이트가 공개 프로젝트 목록에 등록되었습니다."
+        }
+      ]
+    },
     {
       "repo": "child-abuse-mandatory-reporter-training",
       "title": "Child Abuse Mandatory Reporter Training",
@@ -16,9 +142,15 @@
       "language": "HTML",
       "topics": [],
       "stars": 0,
-      "updatedAt": "2026-07-13T10:27:46Z",
+      "updatedAt": "2026-07-13T10:27:42Z",
       "archived": false,
-      "fork": false
+      "fork": false,
+      "updateHistory": [
+        {
+          "date": "2026-07-13T10:27:42Z",
+          "summary": "업데이트 기록 수집을 시작한 코드 기준입니다."
+        }
+      ]
     },
     {
       "repo": "gyosil-ai-learning",
@@ -39,9 +171,15 @@
         "teachers"
       ],
       "stars": 0,
-      "updatedAt": "2026-07-13T07:22:18Z",
+      "updatedAt": "2026-07-13T07:22:12Z",
       "archived": false,
-      "fork": false
+      "fork": false,
+      "updateHistory": [
+        {
+          "date": "2026-07-13T07:22:12Z",
+          "summary": "업데이트 기록 수집을 시작한 코드 기준입니다."
+        }
+      ]
     },
     {
       "repo": "ai-one-step",
@@ -55,9 +193,15 @@
       "language": "TypeScript",
       "topics": [],
       "stars": 0,
-      "updatedAt": "2026-07-13T07:09:31Z",
+      "updatedAt": "2026-07-13T07:09:10Z",
       "archived": false,
-      "fork": false
+      "fork": false,
+      "updateHistory": [
+        {
+          "date": "2026-07-13T07:09:10Z",
+          "summary": "업데이트 기록 수집을 시작한 코드 기준입니다."
+        }
+      ]
     },
     {
       "repo": "question-garden",
@@ -71,9 +215,15 @@
       "language": "Astro",
       "topics": [],
       "stars": 0,
-      "updatedAt": "2026-07-13T06:08:18Z",
+      "updatedAt": "2026-07-13T06:08:01Z",
       "archived": false,
-      "fork": false
+      "fork": false,
+      "updateHistory": [
+        {
+          "date": "2026-07-13T06:08:01Z",
+          "summary": "업데이트 기록 수집을 시작한 코드 기준입니다."
+        }
+      ]
     },
     {
       "repo": "yeonsudam-teacher-training-manager",
@@ -95,9 +245,15 @@
         "typescript"
       ],
       "stars": 0,
-      "updatedAt": "2026-07-13T05:12:03Z",
+      "updatedAt": "2026-07-13T05:11:47Z",
       "archived": false,
-      "fork": false
+      "fork": false,
+      "updateHistory": [
+        {
+          "date": "2026-07-13T05:11:47Z",
+          "summary": "업데이트 기록 수집을 시작한 코드 기준입니다."
+        }
+      ]
     },
     {
       "repo": "good-habits-for-students",
@@ -111,9 +267,15 @@
       "language": "TypeScript",
       "topics": [],
       "stars": 0,
-      "updatedAt": "2026-07-13T04:44:53Z",
+      "updatedAt": "2026-07-13T04:44:48Z",
       "archived": false,
-      "fork": false
+      "fork": false,
+      "updateHistory": [
+        {
+          "date": "2026-07-13T04:44:48Z",
+          "summary": "업데이트 기록 수집을 시작한 코드 기준입니다."
+        }
+      ]
     },
     {
       "repo": "investment-baseline",
@@ -127,41 +289,15 @@
       "language": "Astro",
       "topics": [],
       "stars": 0,
-      "updatedAt": "2026-07-12T23:38:36Z",
+      "updatedAt": "2026-07-12T23:38:33Z",
       "archived": false,
-      "fork": false
-    },
-    {
-      "repo": "Eunhorang.github.io",
-      "title": "Eunhorang.Github.Io",
-      "description": "이은호 축구 포트폴리오 GitHub Pages 공개 배포 저장소",
-      "githubUrl": "https://github.com/Eunhorang/Eunhorang.github.io",
-      "homepageUrl": null,
-      "hasPages": true,
-      "pagesUrl": "https://eunhorang.github.io/",
-      "liveUrl": "https://eunhorang.github.io/",
-      "language": "HTML",
-      "topics": [],
-      "stars": 0,
-      "updatedAt": "2026-07-12T23:33:28Z",
-      "archived": false,
-      "fork": false
-    },
-    {
-      "repo": "web-constellation",
-      "title": "Web Constellation",
-      "description": "이정주가 만든 웹 프로젝트를 한곳에 모은 개인 웹 아카이브",
-      "githubUrl": "https://github.com/Eunhorang/web-constellation",
-      "homepageUrl": "https://eunhorang.github.io/web-constellation/",
-      "hasPages": true,
-      "pagesUrl": "https://eunhorang.github.io/web-constellation/",
-      "liveUrl": "https://eunhorang.github.io/web-constellation/",
-      "language": "TypeScript",
-      "topics": [],
-      "stars": 0,
-      "updatedAt": "2026-07-12T22:56:23Z",
-      "archived": false,
-      "fork": false
+      "fork": false,
+      "updateHistory": [
+        {
+          "date": "2026-07-12T23:38:33Z",
+          "summary": "업데이트 기록 수집을 시작한 코드 기준입니다."
+        }
+      ]
     },
     {
       "repo": "sky-we-share",
@@ -175,25 +311,15 @@
       "language": "CSS",
       "topics": [],
       "stars": 0,
-      "updatedAt": "2026-07-11T15:57:27Z",
+      "updatedAt": "2026-07-11T15:57:23Z",
       "archived": false,
-      "fork": false
-    },
-    {
-      "repo": "lee-jeongju-writer-portfolio",
-      "title": "Lee Jeongju Writer Portfolio",
-      "description": "이정주 작가 포트폴리오 — 말과 마음 사이",
-      "githubUrl": "https://github.com/Eunhorang/lee-jeongju-writer-portfolio",
-      "homepageUrl": null,
-      "hasPages": true,
-      "pagesUrl": "https://eunhorang.github.io/lee-jeongju-writer-portfolio/",
-      "liveUrl": "https://eunhorang.github.io/lee-jeongju-writer-portfolio/",
-      "language": "CSS",
-      "topics": [],
-      "stars": 0,
-      "updatedAt": "2026-07-11T06:47:06Z",
-      "archived": false,
-      "fork": false
+      "fork": false,
+      "updateHistory": [
+        {
+          "date": "2026-07-11T15:57:23Z",
+          "summary": "업데이트 기록 수집을 시작한 코드 기준입니다."
+        }
+      ]
     }
   ]
 }

@@ -42,6 +42,10 @@ npm run check:build
 - fork와 archived는 기본 제외한다.
 - GitHub API 또는 Pages API 실패는 전체 빌드 실패로 만들지 않는다.
 - 마지막 정상 `src/data/projects.generated.json`을 캐시로 유지한다.
+- 마지막 코드 업데이트는 `pushed_at`을 우선하고 값이 없을 때만 `updated_at`을 사용한다.
+- `updateHistory`는 코드 push 시각이 달라질 때만 새 기록을 앞에 추가하고 기존 기록을 지우거나 중복 추가하지 않는다.
+- 삭제한 공개 설명이 남지 않도록 저장소 설명 원문을 `updateHistory` 요약에 누적하지 않는다.
+- 공개 저장소 목록으로 확인할 수 없는 커밋 제목이나 변경 파일을 추측해 업데이트 요약에 쓰지 않는다.
 - Pages 주소 우선순위는 override `liveUrl` → homepage → Pages API → 기본 Pages 주소다.
 - API 응답 전체를 저장하지 않고 필요한 공개 필드만 명시적으로 복사한다.
 

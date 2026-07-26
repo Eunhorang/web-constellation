@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const distDirectory = path.join(root, "dist");
 const generatedPath = path.join(root, "src/data/projects.generated.json");
+const siteConfigPath = path.join(root, "src/data/site-config.json");
 const textExtensions = new Set([
   ".html",
   ".js",
@@ -29,9 +30,11 @@ const allowedProjectKeys = new Set([
   "topics",
   "stars",
   "updatedAt",
+  "updateHistory",
   "archived",
   "fork",
 ]);
+const allowedUpdateKeys = new Set(["date", "summary"]);
 const requiredPngAssets = new Map([
   ["favicon-32x32.png", [32, 32]],
   ["apple-touch-icon.png", [180, 180]],
@@ -66,11 +69,34 @@ async function validatePng(relativePath, expectedSize) {
   }
 }
 
+async function validatePngSize(relativePath, expectedSize, label) {
+  const buffer = await fs.readFile(path.join(distDirectory, relativePath));
+  const signature = buffer.subarray(0, 8).toString("hex");
+  const chunkType = buffer.subarray(12, 16).toString("ascii");
+  const width = buffer.readUInt32BE(16);
+  const height = buffer.readUInt32BE(20);
+  if (signature !== "89504e470d0a1a0a" || chunkType !== "IHDR") {
+    throw new Error(`${label}이(가) 올바른 PNG가 아닙니다: ${relativePath}`);
+  }
+  if (width !== expectedSize[0] || height !== expectedSize[1]) {
+    throw new Error(
+      `${label} 크기가 다릅니다: ${relativePath} (${width}x${height})`,
+    );
+  }
+}
+
 function linkHref(html, relation) {
   const tag = [...html.matchAll(/<link\b[^>]*>/g)].find((match) =>
     match[0].includes(`rel="${relation}"`),
   )?.[0];
   return tag?.match(/href="([^"]+)"/)?.[1] || null;
+}
+
+function metaContent(html, attribute, value) {
+  const tag = [...html.matchAll(/<meta\b[^>]*>/g)].find((match) =>
+    match[0].includes(`${attribute}="${value}"`),
+  )?.[0];
+  return tag?.match(/content="([^"]*)"/)?.[1] || null;
 }
 
 async function listFiles(directory) {
@@ -85,6 +111,7 @@ async function listFiles(directory) {
 }
 
 const generated = JSON.parse(await fs.readFile(generatedPath, "utf8"));
+const siteConfig = JSON.parse(await fs.readFile(siteConfigPath, "utf8"));
 if (!Array.isArray(generated.projects)) {
   throw new Error("생성 데이터의 projects가 목록 형태가 아닙니다.");
 }
@@ -95,6 +122,30 @@ for (const project of generated.projects) {
   }
   if (typeof project.githubUrl !== "string") {
     throw new Error("생성 데이터의 GitHub 주소가 올바르지 않습니다.");
+  }
+  if (!Array.isArray(project.updateHistory) || project.updateHistory.length === 0) {
+    throw new Error(`업데이트 기록이 없습니다: ${project.repo || "이름 없음"}`);
+  }
+  for (const update of project.updateHistory) {
+    if (!update || typeof update !== "object" || Array.isArray(update)) {
+      throw new Error(`업데이트 기록 형식이 올바르지 않습니다: ${project.repo}`);
+    }
+    const unknownUpdateKey = Object.keys(update).find(
+      (key) => !allowedUpdateKeys.has(key),
+    );
+    if (
+      unknownUpdateKey ||
+      typeof update.date !== "string" ||
+      Number.isNaN(Date.parse(update.date)) ||
+      typeof update.summary !== "string" ||
+      update.summary.trim() === "" ||
+      update.summary.length > 240
+    ) {
+      throw new Error(`업데이트 기록 형식이 올바르지 않습니다: ${project.repo}`);
+    }
+  }
+  if (project.updateHistory[0].date !== project.updatedAt) {
+    throw new Error(`최신 업데이트 날짜가 기록 첫 항목과 다릅니다: ${project.repo}`);
   }
   const url = new URL(project.githubUrl);
   const owner = url.pathname.split("/").filter(Boolean)[0];
@@ -107,6 +158,7 @@ const files = await listFiles(distDirectory);
 for (const [relativePath, expectedSize] of requiredPngAssets) {
   await validatePng(relativePath, expectedSize);
 }
+await validatePngSize(siteConfig.ogImage, [1200, 630], "공유 이미지");
 
 const manifest = JSON.parse(
   await fs.readFile(path.join(distDirectory, "site.webmanifest"), "utf8"),
@@ -120,6 +172,12 @@ if (
   !Array.isArray(manifest.icons)
 ) {
   throw new Error("모바일 웹앱 manifest의 필수 설정이 올바르지 않습니다.");
+}
+if (
+  manifest.name !== siteConfig.siteName ||
+  manifest.description !== siteConfig.description
+) {
+  throw new Error("모바일 웹앱 이름 또는 설명이 site-config.json과 다릅니다.");
 }
 for (const icon of manifest.icons) {
   if (
@@ -146,12 +204,48 @@ for (const [src, sizes, purpose] of requiredManifestIcons) {
 const indexHtml = await fs.readFile(path.join(distDirectory, "index.html"), "utf8");
 const manifestHref = linkHref(indexHtml, "manifest");
 const appleIconHref = linkHref(indexHtml, "apple-touch-icon");
+const canonicalUrl = linkHref(indexHtml, "canonical");
+const ogUrl = metaContent(indexHtml, "property", "og:url");
+const ogImageUrl = metaContent(indexHtml, "property", "og:image");
+const applicationName = metaContent(indexHtml, "name", "application-name");
+const appleAppTitle = metaContent(indexHtml, "name", "apple-mobile-web-app-title");
 if (!manifestHref?.endsWith("/site.webmanifest")) {
   throw new Error("빌드 HTML에 웹앱 manifest 경로가 올바르게 연결되지 않았습니다.");
 }
 const basePrefix = manifestHref.slice(0, -"site.webmanifest".length);
 if (appleIconHref !== `${basePrefix}apple-touch-icon.png`) {
   throw new Error("Apple 홈 화면 아이콘과 manifest의 배포 경로가 다릅니다.");
+}
+if (!canonicalUrl || canonicalUrl !== ogUrl) {
+  throw new Error("canonical 주소와 Open Graph 대표 주소가 일치하지 않습니다.");
+}
+if (new URL(siteConfig.ogImage, canonicalUrl).href !== ogImageUrl) {
+  throw new Error("Open Graph 공유 이미지 주소가 대표 주소와 일치하지 않습니다.");
+}
+if (
+  applicationName !== manifest.short_name ||
+  appleAppTitle !== manifest.short_name
+) {
+  throw new Error("브라우저 앱 이름과 site.webmanifest의 short_name이 다릅니다.");
+}
+if (
+  !indexHtml.includes('<div id="root"><div id="top"') ||
+  !indexHtml.includes('<main id="main-content"') ||
+  !indexHtml.includes('<h1 id="hero-title"')
+) {
+  throw new Error("빌드 HTML에 미리 생성된 제목과 본문이 없습니다.");
+}
+
+const [robots, sitemap] = await Promise.all([
+  fs.readFile(path.join(distDirectory, "robots.txt"), "utf8"),
+  fs.readFile(path.join(distDirectory, "sitemap.xml"), "utf8"),
+]);
+const expectedSitemapUrl = new URL("sitemap.xml", canonicalUrl).href;
+if (!robots.includes(`Sitemap: ${expectedSitemapUrl}`)) {
+  throw new Error("robots.txt의 sitemap 주소가 대표 주소와 다릅니다.");
+}
+if (!sitemap.includes(`<loc>${canonicalUrl}</loc>`)) {
+  throw new Error("sitemap.xml의 페이지 주소가 대표 주소와 다릅니다.");
 }
 
 const currentTokens = [process.env.GITHUB_TOKEN, process.env.GH_TOKEN].filter(
@@ -187,5 +281,5 @@ for (const filePath of files) {
 }
 
 console.log(
-  `[security] 공개 프로젝트 ${generated.projects.length}개, 홈 화면 아이콘, dist 토큰 노출 검사를 통과했습니다.`,
+  `[security] 공개 프로젝트 ${generated.projects.length}개, 프리렌더·SEO·아이콘·dist 토큰 검사를 통과했습니다.`,
 );

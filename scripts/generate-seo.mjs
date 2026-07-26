@@ -41,7 +41,7 @@ const customDomainUrl = customDomain
     )
   : null;
 const siteUrl = validateSiteUrl(
-  process.env.SITE_URL?.trim() || customDomainUrl || site.canonicalUrl,
+  customDomainUrl || process.env.SITE_URL?.trim() || site.canonicalUrl,
   "SITE_URL",
 );
 const lastModified = String(generated.generatedAt || new Date().toISOString()).slice(

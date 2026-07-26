@@ -12,9 +12,11 @@ const CACHE_PROJECT_KEYS = new Set([
   "topics",
   "stars",
   "updatedAt",
+  "updateHistory",
   "archived",
   "fork",
 ]);
+const CACHE_UPDATE_KEYS = new Set(["date", "summary"]);
 
 export function isSafeHttpUrl(value) {
   if (typeof value !== "string" || value.trim() === "") return false;
@@ -104,12 +106,130 @@ export function resolveAutomaticLiveUrl({
   );
 }
 
-export function normalizeRepository(repository, { username, pagesUrl }) {
+function hasHigherPriorityLiveUrl(repository, override) {
+  const manualLiveUrl = override?.liveUrl;
+  return (
+    manualLiveUrl === "" ||
+    normalizeUrl(manualLiveUrl) !== null ||
+    normalizeUrl(repository.homepage) !== null
+  );
+}
+
+function repositoryCodeUpdatedAt(repository) {
+  for (const value of [repository.pushed_at, repository.updated_at]) {
+    if (typeof value === "string" && !Number.isNaN(Date.parse(value))) {
+      return value;
+    }
+  }
+  return new Date(0).toISOString();
+}
+
+function sameStrings(left, right) {
+  if (!Array.isArray(left) || !Array.isArray(right)) return false;
+  return (
+    left.length === right.length &&
+    left.every((value, index) => value === right[index])
+  );
+}
+
+function changedRepositoryFields(current, previous) {
+  const changedFields = [];
+  if (current.description !== previous.description) {
+    changedFields.push("프로젝트 설명");
+  }
+  if (
+    current.homepageUrl !== previous.homepageUrl ||
+    current.liveUrl !== previous.liveUrl
+  ) {
+    changedFields.push("공개 사이트 주소");
+  }
+  if (
+    current.language !== previous.language ||
+    !sameStrings(current.topics, previous.topics)
+  ) {
+    changedFields.push("기술 정보");
+  }
+  if (current.hasPages !== previous.hasPages) {
+    changedFields.push("배포 설정");
+  }
+  if (current.archived !== previous.archived) {
+    changedFields.push("보관 상태");
+  }
+  return changedFields;
+}
+
+function summarizeRepositoryUpdate(current, previous) {
+  const changedFields = changedRepositoryFields(current, previous);
+  if (changedFields.length === 0) {
+    return "GitHub 저장소에 새 코드가 반영되었습니다.";
+  }
+  return `새 코드가 반영되었습니다. 함께 바뀐 항목: ${changedFields.join(", ")}.`;
+}
+
+function removeStoredDescription(update) {
+  if (!update.summary.includes("현재 코드의 주요 내용:")) return update;
+  return {
+    ...update,
+    summary: "업데이트 기록 수집을 시작한 코드 기준입니다.",
+  };
+}
+
+function buildUpdateHistory(current, previous) {
+  const previousHistory = Array.isArray(previous?.updateHistory)
+    ? previous.updateHistory.map(removeStoredDescription)
+    : [];
+
+  if (!previous) {
+    return [
+      {
+        date: current.updatedAt,
+        summary: "새 웹사이트가 공개 프로젝트 목록에 등록되었습니다.",
+      },
+    ];
+  }
+
+  // 기존 캐시에 기록 형식이 없으면 잘못된 과거 날짜를 만들지 않고 현재부터 시작합니다.
+  if (previousHistory.length === 0) {
+    return [
+      {
+        date: current.updatedAt,
+        summary: "업데이트 기록 수집을 시작한 현재 최신 코드입니다.",
+      },
+    ];
+  }
+
+  if (previous.updatedAt === current.updatedAt) {
+    const changedFields = changedRepositoryFields(current, previous);
+    if (changedFields.length > 0) {
+      return [
+        {
+          date: current.updatedAt,
+          summary: `프로젝트 공개 정보가 변경되었습니다. 바뀐 항목: ${changedFields.join(", ")}.`,
+        },
+        ...previousHistory.slice(1),
+      ];
+    }
+    return previousHistory;
+  }
+
+  return [
+    {
+      date: current.updatedAt,
+      summary: summarizeRepositoryUpdate(current, previous),
+    },
+    ...previousHistory.filter((update) => update.date !== current.updatedAt),
+  ];
+}
+
+export function normalizeRepository(
+  repository,
+  { username, pagesUrl, previousProject = null },
+) {
   const githubUrl = normalizeUrl(repository.html_url);
   if (!githubUrl) return null;
   const normalizedPagesUrl = normalizeUrl(pagesUrl);
 
-  return {
+  const normalized = {
     repo: String(repository.name),
     title: humanizeRepositoryName(String(repository.name)),
     description:
@@ -136,12 +256,15 @@ export function normalizeRepository(repository, { username, pagesUrl }) {
       typeof repository.stargazers_count === "number"
         ? repository.stargazers_count
         : 0,
-    updatedAt:
-      typeof repository.updated_at === "string"
-        ? repository.updated_at
-        : new Date(0).toISOString(),
+    // updated_at에는 설명·별표 변경도 섞이므로 실제 코드 push 시각을 우선합니다.
+    updatedAt: repositoryCodeUpdatedAt(repository),
     archived: repository.archived === true,
     fork: repository.fork === true,
+  };
+
+  return {
+    ...normalized,
+    updateHistory: buildUpdateHistory(normalized, previousProject),
   };
 }
 
@@ -295,6 +418,33 @@ function isExpectedGitHubUrl(value, username, repositoryName) {
   );
 }
 
+function sanitizeCachedUpdateHistory(value) {
+  // 이전 버전의 정상 캐시는 이 항목이 없으므로 빈 기록으로 안전하게 이전합니다.
+  if (value === undefined) return [];
+  if (!Array.isArray(value) || value.length === 0) return null;
+
+  const dates = new Set();
+  const updates = [];
+  for (const update of value) {
+    if (!update || typeof update !== "object" || Array.isArray(update)) return null;
+    if (Object.keys(update).some((key) => !CACHE_UPDATE_KEYS.has(key))) return null;
+    if (typeof update.date !== "string" || Number.isNaN(Date.parse(update.date))) {
+      return null;
+    }
+    if (
+      typeof update.summary !== "string" ||
+      update.summary.trim() === "" ||
+      update.summary.trim().length > 240
+    ) {
+      return null;
+    }
+    if (dates.has(update.date)) return null;
+    dates.add(update.date);
+    updates.push({ date: update.date, summary: update.summary.trim() });
+  }
+  return updates;
+}
+
 function sanitizeCachedProject(project, username) {
   if (!project || typeof project !== "object" || Array.isArray(project)) return null;
   if (Object.keys(project).some((key) => !CACHE_PROJECT_KEYS.has(key))) return null;
@@ -315,6 +465,11 @@ function sanitizeCachedProject(project, username) {
   if (typeof project.updatedAt !== "string" || Number.isNaN(Date.parse(project.updatedAt))) {
     return null;
   }
+  const updateHistory = sanitizeCachedUpdateHistory(project.updateHistory);
+  if (updateHistory === null) return null;
+  if (updateHistory.length > 0 && updateHistory[0].date !== project.updatedAt) {
+    return null;
+  }
   if (typeof project.archived !== "boolean" || typeof project.fork !== "boolean") {
     return null;
   }
@@ -332,6 +487,7 @@ function sanitizeCachedProject(project, username) {
     topics: project.topics.map((topic) => topic.trim()).filter(Boolean),
     stars: project.stars,
     updatedAt: project.updatedAt,
+    updateHistory,
     archived: project.archived,
     fork: project.fork,
   };
@@ -379,6 +535,25 @@ export function isValidCache(cache, username) {
   return sanitizeCache(cache, username) !== null;
 }
 
+function addBaselineHistoryToLegacyCache(cache) {
+  return {
+    ...cache,
+    projects: cache.projects.map((project) =>
+      project.updateHistory.length > 0
+        ? project
+        : {
+            ...project,
+            updateHistory: [
+              {
+                date: project.updatedAt,
+                summary: "마지막 정상 캐시를 기준으로 업데이트 기록을 시작했습니다.",
+              },
+            ],
+          },
+    ),
+  };
+}
+
 export async function collectGitHubData({
   username,
   token,
@@ -391,8 +566,27 @@ export async function collectGitHubData({
   now = new Date().toISOString(),
   onWarning = () => {},
 }) {
-  const safePreviousCache = sanitizeCache(previousCache, username);
-  if (previousCache && !safePreviousCache) {
+  const sanitizedPreviousCache = sanitizeCache(previousCache, username);
+  const cacheHistoryWasScrubbed =
+    sanitizedPreviousCache?.projects.some((project) =>
+      project.updateHistory.some((update) =>
+        update.summary.includes("현재 코드의 주요 내용:"),
+      ),
+    ) ?? false;
+  const safePreviousCache = sanitizedPreviousCache
+    ? {
+        ...sanitizedPreviousCache,
+        projects: sanitizedPreviousCache.projects.map((project) => ({
+          ...project,
+          updateHistory: project.updateHistory.map(removeStoredDescription),
+        })),
+      }
+    : null;
+  const legacyCacheNeedsHistory =
+    safePreviousCache?.projects.some(
+      (project) => project.updateHistory.length === 0,
+    ) ?? false;
+  if (previousCache && !sanitizedPreviousCache) {
     onWarning("기존 캐시 검증에 실패해 안전한 빈 캐시로 대체합니다.");
   }
 
@@ -422,24 +616,39 @@ export async function collectGitHubData({
 
     const projects = await mapWithConcurrency(included, 6, async (repository) => {
       let pagesUrl = null;
+      const repositoryKey = String(repository.name).toLowerCase();
+      const previousProject = previousByRepo.get(repositoryKey) || null;
       if (repository.has_pages === true) {
-        try {
-          pagesUrl = await fetchPagesUrl({
-            username,
-            repositoryName: repository.name,
-            token,
-            fetchImpl,
-            apiBase,
-            timeoutMs: pagesTimeoutMs,
-          });
-        } catch (error) {
-          pagesUrl = previousByRepo.get(String(repository.name).toLowerCase())?.pagesUrl;
-          onWarning(
-            `${repository.name}: Pages 상세 정보를 읽지 못해 기본 주소를 사용합니다. ${error.message}`,
-          );
+        const previousPagesUrl = previousProject?.pagesUrl;
+        const override = overrideByRepo.get(repositoryKey);
+
+        if (hasHigherPriorityLiveUrl(repository, override)) {
+          // 수동 주소(빈 문자열은 링크 숨김)나 homepage가 최종값이면 상세 조회가 필요 없습니다.
+          // 이미 검증된 캐시 주소는 남겨 두어 이후 설정 변경 때의 실패 대체값으로 활용합니다.
+          pagesUrl = previousPagesUrl || null;
+        } else {
+          try {
+            pagesUrl = await fetchPagesUrl({
+              username,
+              repositoryName: repository.name,
+              token,
+              fetchImpl,
+              apiBase,
+              timeoutMs: pagesTimeoutMs,
+            });
+          } catch (error) {
+            pagesUrl = previousPagesUrl;
+            onWarning(
+              `${repository.name}: Pages 상세 정보를 읽지 못해 기본 주소를 사용합니다. ${error.message}`,
+            );
+          }
         }
       }
-      return normalizeRepository(repository, { username, pagesUrl });
+      return normalizeRepository(repository, {
+        username,
+        pagesUrl,
+        previousProject,
+      });
     });
 
     return {
@@ -456,7 +665,13 @@ export async function collectGitHubData({
   } catch (error) {
     onWarning(`GitHub 동기화 실패: ${error.message}`);
     if (safePreviousCache) {
-      return { data: safePreviousCache, usedCache: true, shouldWrite: false };
+      return {
+        data: legacyCacheNeedsHistory
+          ? addBaselineHistoryToLegacyCache(safePreviousCache)
+          : safePreviousCache,
+        usedCache: true,
+        shouldWrite: legacyCacheNeedsHistory || cacheHistoryWasScrubbed,
+      };
     }
     return {
       data: emptyCache(username, now),

@@ -53,6 +53,33 @@ describe("JSON 설정 검증", () => {
     expect(() => validateGeneratedProjects(unsafe)).toThrow("지원하지 않는 항목");
   });
 
+  it("업데이트 기록의 날짜·요약·허용 필드를 엄격하게 확인한다", () => {
+    const emptySummary = structuredClone(generatedJson) as unknown as {
+      projects: Array<{ updateHistory: Array<Record<string, unknown>> }>;
+    };
+    emptySummary.projects[0].updateHistory[0].summary = "";
+    expect(() => validateGeneratedProjects(emptySummary)).toThrow(
+      "updateHistory[0].summary",
+    );
+
+    const mismatchedDate = structuredClone(generatedJson) as unknown as {
+      projects: Array<{ updateHistory: Array<Record<string, unknown>> }>;
+    };
+    mismatchedDate.projects[0].updateHistory[0].date =
+      "2025-01-01T00:00:00.000Z";
+    expect(() => validateGeneratedProjects(mismatchedDate)).toThrow(
+      "첫 기록은 updatedAt과 같은 최신 날짜",
+    );
+
+    const unknownField = structuredClone(generatedJson) as unknown as {
+      projects: Array<{ updateHistory: Array<Record<string, unknown>> }>;
+    };
+    unknownField.projects[0].updateHistory[0].private = true;
+    expect(() => validateGeneratedProjects(unknownField)).toThrow(
+      "지원하지 않는 항목",
+    );
+  });
+
   it("사이트 주소와 공유 이미지 파일명이 잘못되면 명확히 알린다", () => {
     expect(() =>
       validateSiteConfig({ ...siteConfigJson, canonicalUrl: "javascript:alert(1)" }),

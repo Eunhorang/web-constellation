@@ -74,6 +74,22 @@ describe("GitHub Pages base 경로", () => {
     });
   });
 
+  it("CUSTOM_DOMAIN과 Pages 주소가 함께 있으면 커스텀 도메인을 대표 주소로 쓴다", () => {
+    const result = resolveDeployment(
+      "build",
+      {
+        CUSTOM_DOMAIN: "constellation.example.com",
+        SITE_URL: "https://eunhorang.github.io/web-constellation/",
+      },
+      site,
+      false,
+    );
+    expect(result).toEqual({
+      base: "/",
+      siteUrl: "https://constellation.example.com/",
+    });
+  });
+
   it("잘못된 SITE_URL은 조용히 배포하지 않고 설명 있는 오류를 낸다", () => {
     expect(() =>
       resolveDeployment("build", { SITE_URL: "not-a-url" }, site, false),
@@ -98,6 +114,12 @@ describe("빌드 메타데이터", () => {
       launchedAt: null,
       note: null,
       updatedAt: "2026-07-01T00:00:00.000Z",
+      updateHistory: [
+        {
+          date: "2026-07-01T00:00:00.000Z",
+          summary: "샘플 프로젝트의 최신 코드가 반영되었습니다.",
+        },
+      ],
       language: "TypeScript",
       stars: 0,
       sourceOnly: false,

@@ -8,6 +8,26 @@ import type {
 } from "../types/project";
 
 const DEFAULT_ACCENTS = ["#66766a", "#8a6d55", "#718294", "#7a6f86"];
+const KOREAN_DATE_FORMATTER = new Intl.DateTimeFormat("ko-KR", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+  timeZone: "Asia/Seoul",
+});
+const KOREAN_DATE_TIME_FORMATTER = new Intl.DateTimeFormat("ko-KR", {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+  timeZone: "Asia/Seoul",
+});
+const KOREAN_YEAR_FORMATTER = new Intl.DateTimeFormat("en", {
+  year: "numeric",
+  timeZone: "Asia/Seoul",
+});
+const SEARCHABLE_TEXT_CACHE = new WeakMap<Project, string>();
 const VALID_STATUSES = new Set<ProjectStatus>([
   "live",
   "experiment",
@@ -155,6 +175,7 @@ export function mergeProjects(
             : null,
         note: typeof override?.note === "string" ? override.note : null,
         updatedAt: automatic.updatedAt,
+        updateHistory: automatic.updateHistory,
         language: automatic.language,
         stars: automatic.stars,
         sourceOnly: liveUrl === null,
@@ -169,16 +190,22 @@ export function getFeaturedProjects(projects: Project[]): Project[] {
 }
 
 function searchableText(project: Project): string {
-  return [
+  const cached = SEARCHABLE_TEXT_CACHE.get(project);
+  if (cached) return cached;
+
+  const normalized = [
     project.title,
     project.description,
     project.repo,
     project.category,
+    project.updateHistory[0]?.summary ?? "",
     ...project.tags,
   ]
     .join(" ")
     .normalize("NFKC")
     .toLocaleLowerCase("ko");
+  SEARCHABLE_TEXT_CACHE.set(project, normalized);
+  return normalized;
 }
 
 export function sortProjects(
@@ -242,9 +269,17 @@ export function projectElementId(repo: string): string {
 export function formatKoreanDate(value: string): string {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "날짜 미상";
-  return new Intl.DateTimeFormat("ko-KR", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  }).format(date);
+  return KOREAN_DATE_FORMATTER.format(date);
+}
+
+export function formatKoreanDateTime(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "날짜 미상";
+  return KOREAN_DATE_TIME_FORMATTER.format(date);
+}
+
+export function formatKoreanYear(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return KOREAN_YEAR_FORMATTER.format(new Date());
+  return KOREAN_YEAR_FORMATTER.format(date);
 }

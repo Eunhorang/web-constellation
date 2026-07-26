@@ -62,7 +62,7 @@ export function SectionHeading({
     <header className="section-heading">
       <p className="eyebrow">{eyebrow}</p>
       <div className="section-heading__copy">
-        <h2 id={id}>{title}</h2>
+        <h2 id={id} tabIndex={-1}>{title}</h2>
         {description ? <p>{description}</p> : null}
       </div>
     </header>

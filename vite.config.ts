@@ -61,7 +61,8 @@ export function resolveDeployment(
         true,
       )
     : null;
-  const configuredUrl = env.SITE_URL?.trim() || customDomainUrl || site.canonicalUrl;
+  // 커스텀 도메인이 있으면 GitHub Pages 임시 주소보다 대표 주소로 우선합니다.
+  const configuredUrl = customDomainUrl || env.SITE_URL?.trim() || site.canonicalUrl;
   const siteUrl = normalizeSiteUrl(configuredUrl, "SITE_URL");
 
   return { base, siteUrl };

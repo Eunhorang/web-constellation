@@ -12,6 +12,7 @@
   --sage-soft: #dde2dc;
   --line: rgb(32 37 34 / 12%);
   --line-strong: rgb(32 37 34 / 22%);
+  --control-border: #858d88;
   --paper-shadow: 0 24px 70px -54px rgb(32 37 34 / 42%);
   --radius-small: 12px;
   --radius: 16px;
@@ -679,17 +680,18 @@ main:focus-visible {
   transform: translate(0.3rem, -50%);
 }
 
-.constellation-node__button:is(:hover, :focus-visible) .constellation-node__tooltip {
+.constellation-node__button[data-tooltip-visible="true"] .constellation-node__tooltip {
   opacity: 1;
+  pointer-events: auto;
 }
 
-.constellation-node__button[data-tooltip-side="bottom"]:is(:hover, :focus-visible) .constellation-node__tooltip,
-.constellation-node__button[data-tooltip-side="top"]:is(:hover, :focus-visible) .constellation-node__tooltip {
+.constellation-node__button[data-tooltip-visible="true"][data-tooltip-side="bottom"] .constellation-node__tooltip,
+.constellation-node__button[data-tooltip-visible="true"][data-tooltip-side="top"] .constellation-node__tooltip {
   transform: translate(-50%, 0);
 }
 
-.constellation-node__button[data-tooltip-side="left"]:is(:hover, :focus-visible) .constellation-node__tooltip,
-.constellation-node__button[data-tooltip-side="right"]:is(:hover, :focus-visible) .constellation-node__tooltip {
+.constellation-node__button[data-tooltip-visible="true"][data-tooltip-side="left"] .constellation-node__tooltip,
+.constellation-node__button[data-tooltip-visible="true"][data-tooltip-side="right"] .constellation-node__tooltip {
   transform: translate(0, -50%);
 }
 
@@ -746,6 +748,8 @@ main:focus-visible {
   background: rgb(250 249 245 / 82%);
   box-shadow: 0 15px 38px -38px rgb(32 37 34 / 46%);
   overflow: hidden;
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto 23rem;
   transition: border-color 200ms ease, background-color 200ms ease, transform 200ms ease;
 }
 
@@ -779,6 +783,7 @@ main:focus-visible {
 .project-card--featured {
   min-height: 25rem;
   padding: 1.55rem;
+  contain-intrinsic-block-size: auto 25rem;
 }
 
 .project-card--standard {
@@ -787,6 +792,7 @@ main:focus-visible {
 
 .project-card--compact {
   min-height: 19rem;
+  contain-intrinsic-block-size: auto 19rem;
 }
 
 .project-card__topline {
@@ -862,14 +868,10 @@ main:focus-visible {
 }
 
 .project-card__copy p {
-  display: -webkit-box;
   margin: 0.78rem 0 0;
-  overflow: hidden;
   color: var(--muted);
   font-size: 1rem;
   line-height: 1.68;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
 }
 
 .tag-list {
@@ -909,6 +911,107 @@ main:focus-visible {
   color: #4c5650;
   font-weight: 680;
   text-align: right;
+}
+
+.project-card__updates {
+  margin-top: 0.85rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
+}
+
+.project-card__updates h4 {
+  margin: 0;
+  color: var(--sage-deep);
+  font-size: 0.8125rem;
+  font-weight: 750;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+}
+
+.project-card__updates > p {
+  margin: 0.35rem 0 0;
+  color: #3f4843;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.project-card__update-history {
+  margin-top: 0.55rem;
+}
+
+.project-card__update-history summary {
+  display: list-item;
+  box-sizing: border-box;
+  min-height: 2.75rem;
+  width: fit-content;
+  max-width: 100%;
+  padding-block: 0.7rem;
+  border-radius: 0.35rem;
+  color: #59625d;
+  font-size: 0.8125rem;
+  font-weight: 720;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.project-card__update-history summary:hover,
+.project-card__update-history[open] summary {
+  color: var(--ink);
+}
+
+.project-card__update-history summary:focus-visible {
+  outline: 2px solid var(--sage-deep);
+  outline-offset: 2px;
+}
+
+.project-card__update-history ol {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0.25rem 0 0;
+  padding-left: 1.3rem;
+}
+
+.project-card__update-history li {
+  min-width: 0;
+  padding-left: 0.15rem;
+}
+
+.project-card__update-history li::marker {
+  color: var(--sage-deep);
+  font-size: 0.75rem;
+  font-weight: 750;
+}
+
+.project-card__update-entry {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(6.8rem, auto) minmax(0, 1fr);
+  gap: 0.6rem;
+  align-items: start;
+}
+
+.project-card__update-entry time {
+  color: #59625d;
+  font-size: 0.75rem;
+  font-weight: 680;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.55;
+  white-space: nowrap;
+}
+
+.project-card__update-entry p,
+.project-card__update-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.project-card__update-note {
+  margin-top: 0.7rem;
 }
 
 .project-card__links {
@@ -993,7 +1096,7 @@ main:focus-visible {
 .select-wrap select {
   width: 100%;
   min-height: 3rem;
-  border: 1px solid var(--line);
+  border: 1px solid var(--control-border);
   border-radius: var(--radius-small);
   background: var(--surface-strong);
   color: var(--ink);
@@ -1002,7 +1105,7 @@ main:focus-visible {
 }
 
 .search-input input {
-  padding: 0.65rem 2.5rem 0.65rem 2.55rem;
+  padding: 0.65rem 3.15rem 0.65rem 2.55rem;
 }
 
 .search-input input::placeholder {
@@ -1026,7 +1129,7 @@ main:focus-visible {
   top: 50%;
   right: 0.72rem;
   display: grid;
-  width: 1.45rem;
+  width: 2rem;
   height: 1.45rem;
   place-items: center;
   border: 1px solid var(--line);
@@ -1034,7 +1137,8 @@ main:focus-visible {
   background: #f2f1ec;
   color: var(--muted);
   font-family: var(--font-sans);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
+  font-weight: 700;
   transform: translateY(-50%);
 }
 
@@ -1096,6 +1200,28 @@ main:focus-visible {
 .reset-button:disabled {
   opacity: 0.38;
   cursor: not-allowed;
+}
+
+.load-more {
+  display: grid;
+  justify-items: center;
+  gap: 0.55rem;
+  margin-top: 1.5rem;
+}
+
+.load-more .button {
+  min-width: 11rem;
+}
+
+.load-more .button span {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.load-more p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8125rem;
 }
 
 .empty-state {
@@ -1437,7 +1563,8 @@ main:focus-visible {
   }
 
   .constellation-node__tooltip > span {
-    -webkit-line-clamp: 1;
+    display: block;
+    overflow: visible;
   }
 
   .project-grid--featured,
@@ -1454,6 +1581,14 @@ main:focus-visible {
 
   .filter-field--search {
     grid-column: 1 / -1;
+  }
+
+  .search-input input {
+    padding-right: 0.85rem;
+  }
+
+  .search-input kbd {
+    display: none;
   }
 
   .about-panel {
@@ -1523,6 +1658,15 @@ main:focus-visible {
     text-align: left;
   }
 
+  .project-card__update-entry {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.1rem;
+  }
+
+  .project-card__update-entry time {
+    white-space: normal;
+  }
+
   .about-panel {
     padding: 1.5rem;
   }
@@ -1536,5 +1680,26 @@ main:focus-visible {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@media (forced-colors: active) {
+  .project-card,
+  .project-card__updates,
+  .filter-panel,
+  .search-input input,
+  .select-wrap select,
+  .constellation,
+  .constellation-node__button {
+    border-color: CanvasText;
+  }
+
+  .project-card__update-history summary:focus-visible {
+    outline-color: Highlight;
+  }
+
+  .constellation-node__dot,
+  .status-badge__mark {
+    background: CanvasText;
   }
 }

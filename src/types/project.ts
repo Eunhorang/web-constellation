@@ -1,6 +1,11 @@
 export type ProjectStatus = "live" | "experiment" | "building" | "archived";
 export type ProjectSort = "custom" | "updated" | "name";
 
+export interface ProjectUpdate {
+  date: string;
+  summary: string;
+}
+
 export interface AutoProject {
   repo: string;
   title: string;
@@ -14,6 +19,7 @@ export interface AutoProject {
   topics: string[];
   stars: number;
   updatedAt: string;
+  updateHistory: ProjectUpdate[];
   archived: boolean;
   fork: boolean;
 }
@@ -50,6 +56,7 @@ export interface Project {
   launchedAt: string | null;
   note: string | null;
   updatedAt: string;
+  updateHistory: ProjectUpdate[];
   language: string | null;
   stars: number;
   sourceOnly: boolean;

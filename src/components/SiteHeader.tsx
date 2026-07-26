@@ -10,18 +10,29 @@ interface SiteHeaderProps {
 export function SiteHeader({ siteName, githubUrl }: SiteHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 12);
-    handleScroll();
+    let frame = 0;
+    const updateScrolledState = () => {
+      frame = 0;
+      setScrolled(window.scrollY > 12);
+    };
+    const handleScroll = () => {
+      if (frame === 0) frame = window.requestAnimationFrame(updateScrolledState);
+    };
+    updateScrolledState();
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (frame !== 0) window.cancelAnimationFrame(frame);
+    };
   }, []);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && menuOpen) {
+      if (event.key === "Escape" && menuOpen && !event.defaultPrevented) {
         event.preventDefault();
         event.stopImmediatePropagation();
         setMenuOpen(false);
@@ -32,10 +43,40 @@ export function SiteHeader({ siteName, githubUrl }: SiteHeaderProps) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [menuOpen]);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !headerRef.current?.contains(event.target)
+      ) {
+        setMenuOpen(false);
+      }
+    };
+    const desktopQuery = window.matchMedia("(min-width: 48rem)");
+    const handleDesktopChange = (event: MediaQueryListEvent) => {
+      if (event.matches) setMenuOpen(false);
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    desktopQuery.addEventListener("change", handleDesktopChange);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      desktopQuery.removeEventListener("change", handleDesktopChange);
+    };
+  }, [menuOpen]);
+
   const closeMenu = () => setMenuOpen(false);
+  const closeMenuAndFocus = (headingId: string) => {
+    setMenuOpen(false);
+    window.requestAnimationFrame(() => {
+      document.getElementById(headingId)?.focus({ preventScroll: true });
+    });
+  };
 
   return (
-    <header className="site-header" data-scrolled={scrolled}>
+    <header ref={headerRef} className="site-header" data-scrolled={scrolled}>
       <div className="site-header__inner page-container">
         <a className="brand" href="#top" aria-label={`${siteName} 처음으로`} onClick={closeMenu}>
           <span className="brand__mark" aria-hidden="true">
@@ -62,10 +103,19 @@ export function SiteHeader({ siteName, githubUrl }: SiteHeaderProps) {
           data-open={menuOpen}
           aria-label="주요 메뉴"
         >
-          <a href="#projects" onClick={closeMenu}>프로젝트</a>
-          <a href="#map" onClick={closeMenu}>지도</a>
-          <a href="#about" onClick={closeMenu}>소개</a>
-          <ExternalLink href={githubUrl} className="nav-github" onClick={closeMenu}>
+          <a href="#projects" onClick={() => closeMenuAndFocus("projects-title")}>프로젝트</a>
+          <a href="#map" onClick={() => closeMenuAndFocus("map-title")}>지도</a>
+          <a href="#about" onClick={() => closeMenuAndFocus("about-title")}>소개</a>
+          <ExternalLink
+            href={githubUrl}
+            className="nav-github"
+            onClick={() => {
+              if (menuOpen) {
+                closeMenu();
+                window.requestAnimationFrame(() => menuButtonRef.current?.focus());
+              }
+            }}
+          >
             GitHub
           </ExternalLink>
         </nav>

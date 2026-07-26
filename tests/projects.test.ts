@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   filterProjects,
+  formatKoreanDate,
+  formatKoreanDateTime,
+  formatKoreanYear,
   getFeaturedProjects,
   mergeProjects,
   projectElementId,
@@ -29,6 +32,12 @@ function automaticProject(
     topics: ["react"],
     stars: 0,
     updatedAt: "2026-07-01T00:00:00.000Z",
+    updateHistory: [
+      {
+        date: "2026-07-01T00:00:00.000Z",
+        summary: `${repo} 최신 코드가 반영되었습니다.`,
+      },
+    ],
     archived: false,
     fork: false,
     ...overrides,
@@ -171,6 +180,29 @@ describe("프로젝트 탐색", () => {
     ).toEqual(["writing-note"]);
   });
 
+  it("가장 최근 업데이트 요약으로도 프로젝트를 검색한다", () => {
+    const updateProject = mergeProjects(
+      [
+        automaticProject("update-note", {
+          updateHistory: [
+            {
+              date: "2026-07-01T00:00:00.000Z",
+              summary: "모바일 메뉴 접근성을 개선했습니다.",
+            },
+          ],
+        }),
+      ],
+      [],
+    );
+
+    expect(
+      filterProjects(updateProject, {
+        ...allFilters,
+        query: "모바일 메뉴",
+      }).map((project) => project.repo),
+    ).toEqual(["update-note"]);
+  });
+
   it("상태 필터를 적용한다", () => {
     expect(
       filterProjects(projects, { ...allFilters, status: "experiment" }).map(
@@ -205,5 +237,15 @@ describe("프로젝트 탐색", () => {
   it("비슷한 저장소 이름도 서로 다른 DOM id를 만든다", () => {
     const ids = ["a.b", "a-b", "a_b"].map(projectElementId);
     expect(new Set(ids).size).toBe(3);
+  });
+});
+
+describe("한국 시간 날짜 표시", () => {
+  it("실행하는 컴퓨터의 시간대와 관계없이 한국 날짜와 연도를 표시한다", () => {
+    const newYearInKorea = "2025-12-31T16:00:00.000Z";
+    expect(formatKoreanDate(newYearInKorea)).toBe("2026년 1월 1일");
+    expect(formatKoreanDateTime(newYearInKorea)).toContain("2026년 1월 1일");
+    expect(formatKoreanDateTime(newYearInKorea)).toContain("01:00");
+    expect(formatKoreanYear(newYearInKorea)).toBe("2026");
   });
 });

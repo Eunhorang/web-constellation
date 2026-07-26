@@ -1,5 +1,5 @@
 import { ExternalLink } from "./Common";
-import { formatKoreanDate } from "@/lib/projects";
+import { formatKoreanDate, formatKoreanYear } from "@/lib/projects";
 
 interface SiteFooterProps {
   siteName: string;
@@ -26,7 +26,7 @@ export function SiteFooter({
             마지막 동기화 <time dateTime={generatedAt}>{formatKoreanDate(generatedAt)}</time>
           </span>
           <ExternalLink href={githubUrl}>GitHub</ExternalLink>
-          <span>© {new Date().getFullYear()} {owner}</span>
+          <span>© {formatKoreanYear(generatedAt)} {owner}</span>
         </div>
       </div>
     </footer>

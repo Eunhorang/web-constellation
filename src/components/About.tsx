@@ -10,14 +10,14 @@ export function About({ config }: { config: SiteConfig }) {
       <div className="about-panel">
         <div>
           <p className="eyebrow">ABOUT THE MAKER</p>
-          <h2 id="about-title">
+          <h2 id="about-title" tabIndex={-1}>
             <span className="about-panel__title">{config.aboutTitle}</span>
             <span className="about-panel__nickname">{config.aboutNickname}</span>
           </h2>
         </div>
         <div className="about-panel__body">
           <p>{config.aboutText}</p>
-          <div className="about-links" aria-label="제작자 채널">
+          <nav className="about-links" aria-label="제작자 채널">
             <ExternalLink href={githubUrl} className="about-link" showArrow={false}>
               <GitBranchIcon className="link-icon" />
               GitHub
@@ -34,7 +34,7 @@ export function About({ config }: { config: SiteConfig }) {
                 {config.channelLabel}
               </ExternalLink>
             ) : null}
-          </div>
+          </nav>
         </div>
       </div>
     </section>

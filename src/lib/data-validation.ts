@@ -3,6 +3,7 @@ import type {
   GeneratedProjects,
   ProjectOverride,
   ProjectStatus,
+  ProjectUpdate,
   SiteConfig,
 } from "../types/project";
 
@@ -26,6 +27,7 @@ const AUTO_PROJECT_KEYS = new Set([
   "topics",
   "stars",
   "updatedAt",
+  "updateHistory",
   "archived",
   "fork",
 ]);
@@ -171,6 +173,29 @@ function dateOnly(value: unknown, path: string): string {
   return raw;
 }
 
+function projectUpdateHistory(value: unknown, path: string): ProjectUpdate[] {
+  if (!Array.isArray(value) || value.length === 0) {
+    return invalid(path, "업데이트 기록이 한 건 이상 있어야 합니다.");
+  }
+
+  const seenDates = new Set<string>();
+  return value.map((entry, index) => {
+    const entryPath = `${path}[${index}]`;
+    const item = record(entry, entryPath);
+    knownKeys(item, new Set(["date", "summary"]), entryPath);
+    const date = dateTime(item.date, `${entryPath}.date`);
+    const summary = stringValue(item.summary, `${entryPath}.summary`);
+    if (summary.length > 240) {
+      invalid(`${entryPath}.summary`, "240자 이하로 간단히 작성해야 합니다.");
+    }
+    if (seenDates.has(date)) {
+      invalid(`${entryPath}.date`, "같은 업데이트 날짜가 두 번 들어 있습니다.");
+    }
+    seenDates.add(date);
+    return { date, summary };
+  });
+}
+
 function stringArray(value: unknown, path: string): string[] {
   if (!Array.isArray(value)) return invalid(path, "글자 목록이어야 합니다.");
   return value.map((item, index) => stringValue(item, `${path}[${index}]`));
@@ -185,6 +210,17 @@ function validateAutoProject(value: unknown, index: number): AutoProject {
   if (!Number.isInteger(stars) || stars < 0) {
     invalid(`${path}.stars`, "0 이상의 정수여야 합니다.");
   }
+  const updatedAt = dateTime(item.updatedAt, `${path}.updatedAt`);
+  const updateHistory = projectUpdateHistory(
+    item.updateHistory,
+    `${path}.updateHistory`,
+  );
+  if (updateHistory[0].date !== updatedAt) {
+    invalid(
+      `${path}.updateHistory[0].date`,
+      "첫 기록은 updatedAt과 같은 최신 날짜여야 합니다.",
+    );
+  }
 
   return {
     repo: stringValue(item.repo, `${path}.repo`),
@@ -198,7 +234,8 @@ function validateAutoProject(value: unknown, index: number): AutoProject {
     language: nullableString(item.language, `${path}.language`),
     topics: stringArray(item.topics, `${path}.topics`),
     stars,
-    updatedAt: dateTime(item.updatedAt, `${path}.updatedAt`),
+    updatedAt,
+    updateHistory,
     archived: booleanValue(item.archived, `${path}.archived`),
     fork: booleanValue(item.fork, `${path}.fork`),
   };

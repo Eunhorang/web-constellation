@@ -1,4 +1,4 @@
-import { useMemo, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { SectionHeading } from "./Common";
 import { buildConstellation } from "@/lib/constellation";
 import { requestProjectCard } from "@/lib/project-navigation";
@@ -7,6 +7,32 @@ import type { Project } from "@/types/project";
 
 export function ConstellationMap({ projects }: { projects: Project[] }) {
   const constellation = useMemo(() => buildConstellation(projects), [projects]);
+  const [hoveredRepo, setHoveredRepo] = useState<string | null>(null);
+  const [focusedRepo, setFocusedRepo] = useState<string | null>(null);
+  const [dismissedRepo, setDismissedRepo] = useState<string | null>(null);
+  // 마우스로 가리킨 좌표를 우선해 한 번에 설명 하나만 표시합니다.
+  const activeRepo = hoveredRepo ?? focusedRepo;
+
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || !activeRepo) return;
+      event.preventDefault();
+      setDismissedRepo(activeRepo);
+    };
+    // 캡처 단계에서 먼저 처리해 검색창의 Esc 지우기와 동시에 실행되지 않게 합니다.
+    window.addEventListener("keydown", handleEscape, { capture: true });
+    return () => window.removeEventListener("keydown", handleEscape, { capture: true });
+  }, [activeRepo]);
+
+  useEffect(() => {
+    if (
+      dismissedRepo &&
+      dismissedRepo !== hoveredRepo &&
+      dismissedRepo !== focusedRepo
+    ) {
+      setDismissedRepo(null);
+    }
+  }, [dismissedRepo, focusedRepo, hoveredRepo]);
 
   if (projects.length === 0) return null;
 
@@ -46,6 +72,10 @@ export function ConstellationMap({ projects }: { projects: Project[] }) {
         <ol className="constellation__nodes" aria-label="별자리 프로젝트 목록">
           {constellation.nodes.map((node, index) => {
             const tooltipId = `constellation-tooltip-${projectIdToken(node.project.repo)}`;
+            const descriptionId = `${tooltipId}-description`;
+            const tooltipVisible =
+              dismissedRepo !== node.project.repo &&
+              activeRepo === node.project.repo;
             return (
             <li
               key={node.project.repo}
@@ -61,9 +91,14 @@ export function ConstellationMap({ projects }: { projects: Project[] }) {
                 className="constellation-node__button"
                 data-featured={node.project.featured}
                 data-tooltip-side={node.tooltipSide}
+                data-tooltip-visible={tooltipVisible}
                 onClick={() => requestProjectCard(node.project.repo)}
-                aria-label={`${node.project.title}, ${STATUS_LABELS[node.project.status]} — 프로젝트 카드로 이동`}
-                aria-describedby={tooltipId}
+                onPointerEnter={() => setHoveredRepo(node.project.repo)}
+                onPointerLeave={() => setHoveredRepo(null)}
+                onFocus={() => setFocusedRepo(node.project.repo)}
+                onBlur={() => setFocusedRepo(null)}
+                aria-label={`${node.project.title}, ${node.project.category}, ${STATUS_LABELS[node.project.status]} — 프로젝트 카드로 이동`}
+                aria-describedby={descriptionId}
               >
                 <span className="constellation-node__index" aria-hidden="true">
                   {String(index + 1).padStart(2, "0")}
@@ -71,7 +106,7 @@ export function ConstellationMap({ projects }: { projects: Project[] }) {
                 <span className="constellation-node__dot" aria-hidden="true" />
                 <span id={tooltipId} role="tooltip" className="constellation-node__tooltip">
                   <strong>{node.project.title}</strong>
-                  <span>{node.project.description}</span>
+                  <span id={descriptionId}>{node.project.description}</span>
                   <small>{node.project.category} · {STATUS_LABELS[node.project.status]}</small>
                 </span>
               </button>
