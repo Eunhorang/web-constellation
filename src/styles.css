@@ -1396,6 +1396,12 @@ main:focus-visible {
   font-weight: 700;
 }
 
+@media (min-width: 67.51rem) {
+  .project-grid--featured > :first-child {
+    grid-column: span 2;
+  }
+}
+
 @media (max-width: 67.5rem) {
   .filter-panel {
     grid-template-columns: repeat(4, minmax(0, 1fr));
