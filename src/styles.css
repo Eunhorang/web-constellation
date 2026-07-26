@@ -573,6 +573,29 @@ main:focus-visible {
   stroke-dasharray: 3 5;
   stroke-width: 1;
   vector-effect: non-scaling-stroke;
+
+  /* 기본값은 완전히 보이는 상태입니다. 자바스크립트가 실행되지 않아도 선이 그대로 보입니다. */
+  opacity: 1;
+}
+
+/* 지도 섹션이 아직 화면에 들어오지 않았다면 선을 감춰 둡니다. */
+.reveal-pending .constellation__lines line {
+  opacity: 0;
+}
+
+/* 섹션이 화면에 들어오면 선마다 지연 시간을 두고 차례로 나타납니다. */
+.reveal-in .constellation__lines line {
+  animation: line-fade-in 520ms ease forwards;
+}
+
+@keyframes line-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .constellation__nodes {

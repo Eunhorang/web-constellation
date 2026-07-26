@@ -3,6 +3,7 @@ import { SectionHeading } from "./Common";
 import { buildConstellation, computeMagneticOffset } from "@/lib/constellation";
 import { requestProjectCard } from "@/lib/project-navigation";
 import { projectIdToken, STATUS_LABELS } from "@/lib/projects";
+import { useRevealOnScroll } from "@/lib/use-reveal-on-scroll";
 import type { Project } from "@/types/project";
 
 export function ConstellationMap({ projects }: { projects: Project[] }) {
@@ -16,6 +17,8 @@ export function ConstellationMap({ projects }: { projects: Project[] }) {
   >(null);
   // 움직임 최소화 설정을 매번 다시 조회하지 않도록 ref에 담아 둡니다.
   const reducedMotionRef = useRef(false);
+  // 지도 섹션이 화면에 들어올 때 한 번만 부드럽게 나타나게 합니다.
+  const { ref: sectionRef, className: revealClassName } = useRevealOnScroll<HTMLElement>();
   // 마우스로 가리킨 좌표를 우선해 한 번에 설명 하나만 표시합니다.
   const activeRepo = hoveredRepo ?? focusedRepo;
 
@@ -71,7 +74,12 @@ export function ConstellationMap({ projects }: { projects: Project[] }) {
   if (projects.length === 0) return null;
 
   return (
-    <section id="map" className="section page-container" aria-labelledby="map-title">
+    <section
+      id="map"
+      ref={sectionRef}
+      className={`section page-container${revealClassName ? ` ${revealClassName}` : ""}`}
+      aria-labelledby="map-title"
+    >
       <SectionHeading
         eyebrow="PROJECT MAP"
         title="웹 별자리 지도"
@@ -91,13 +99,15 @@ export function ConstellationMap({ projects }: { projects: Project[] }) {
           focusable="false"
         >
           <g>
-            {constellation.edges.map((edge) => (
+            {constellation.edges.map((edge, edgeIndex) => (
               <line
                 key={`${edge.from.project.repo}-${edge.to.project.repo}`}
                 x1={edge.from.x}
                 y1={edge.from.y}
                 x2={edge.to.x}
                 y2={edge.to.y}
+                // 선마다 조금씩 늦게 나타나 순서대로 이어지는 느낌을 줍니다.
+                style={{ animationDelay: `${edgeIndex * 70}ms` }}
               />
             ))}
           </g>
