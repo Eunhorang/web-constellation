@@ -763,12 +763,20 @@ main:focus-visible {
   background: var(--project-accent);
   content: "";
   opacity: 0.72;
+  transition: right 220ms ease, left 220ms ease, opacity 220ms ease;
 }
 
 .project-card:hover {
   border-color: rgb(32 37 34 / 22%);
   background: var(--surface);
-  transform: translateY(-2px);
+  box-shadow: 0 32px 70px -40px rgb(32 37 34 / 38%);
+  transform: translateY(-3px);
+}
+
+.project-card:hover::before {
+  right: 0.55rem;
+  left: 0.55rem;
+  opacity: 1;
 }
 
 .project-card:focus {
