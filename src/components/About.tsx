@@ -1,12 +1,19 @@
 import { ExternalLink } from "./Common";
 import { GitBranchIcon, MailIcon } from "./Icons";
+import { useRevealOnScroll } from "@/lib/use-reveal-on-scroll";
 import type { SiteConfig } from "@/types/project";
 
 export function About({ config }: { config: SiteConfig }) {
+  const { ref, className } = useRevealOnScroll<HTMLElement>();
   const githubUrl = `https://github.com/${config.githubUsername}`;
 
   return (
-    <section id="about" className="section page-container" aria-labelledby="about-title">
+    <section
+      id="about"
+      ref={ref}
+      className={`section page-container${className ? ` ${className}` : ""}`}
+      aria-labelledby="about-title"
+    >
       <div className="about-panel">
         <div>
           <p className="eyebrow">ABOUT THE MAKER</p>

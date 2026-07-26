@@ -1,12 +1,19 @@
 import { ProjectCard } from "./ProjectCard";
 import { SectionHeading } from "./Common";
+import { useRevealOnScroll } from "@/lib/use-reveal-on-scroll";
 import type { Project } from "@/types/project";
 
 export function FeaturedProjects({ projects }: { projects: Project[] }) {
+  // 훅 호출은 조건부 return보다 먼저 와야 합니다.
+  const { ref, className } = useRevealOnScroll<HTMLElement>();
   if (projects.length === 0) return null;
 
   return (
-    <section className="section page-container" aria-labelledby="featured-title">
+    <section
+      ref={ref}
+      className={`section page-container${className ? ` ${className}` : ""}`}
+      aria-labelledby="featured-title"
+    >
       <SectionHeading
         eyebrow="SELECTED COORDINATES"
         title="대표 프로젝트"

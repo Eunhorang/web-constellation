@@ -1,5 +1,6 @@
 import { ExternalLink } from "./Common";
 import { formatKoreanDate } from "@/lib/projects";
+import { useRevealOnScroll } from "@/lib/use-reveal-on-scroll";
 
 interface HeroProps {
   englishLabel: string;
@@ -22,8 +23,14 @@ export function Hero({
   generatedAt,
   githubUrl,
 }: HeroProps) {
+  const { ref, className } = useRevealOnScroll<HTMLElement>();
+
   return (
-    <section className="hero page-container" aria-labelledby="hero-title">
+    <section
+      ref={ref}
+      className={`hero page-container${className ? ` ${className}` : ""}`}
+      aria-labelledby="hero-title"
+    >
       <div className="hero__copy">
         <p className="eyebrow hero__label">{englishLabel}</p>
         <h1 id="hero-title">{siteName}</h1>

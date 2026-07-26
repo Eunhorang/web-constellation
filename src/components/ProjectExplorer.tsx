@@ -14,6 +14,7 @@ import {
   PROJECT_SELECT_EVENT,
   type ProjectSelectDetail,
 } from "@/lib/project-navigation";
+import { useRevealOnScroll } from "@/lib/use-reveal-on-scroll";
 import type {
   Project,
   ProjectFilters,
@@ -89,6 +90,7 @@ export function ProjectExplorer({ projects }: { projects: Project[] }) {
   const [visibleCount, setVisibleCount] = useState(RESULTS_PAGE_SIZE);
   const [pendingProjectRepo, setPendingProjectRepo] = useState<string | null>(null);
   const searchRef = useRef<HTMLInputElement>(null);
+  const { ref: sectionRef, className: revealClassName } = useRevealOnScroll<HTMLElement>();
   const categories = useMemo(
     () => uniqueValues(projects.map((project) => project.category)),
     [projects],
@@ -221,7 +223,12 @@ export function ProjectExplorer({ projects }: { projects: Project[] }) {
   };
 
   return (
-    <section id="projects" className="section page-container" aria-labelledby="projects-title">
+    <section
+      id="projects"
+      ref={sectionRef}
+      className={`section page-container${revealClassName ? ` ${revealClassName}` : ""}`}
+      aria-labelledby="projects-title"
+    >
       <SectionHeading
         eyebrow="PROJECT ARCHIVE"
         title="전체 프로젝트 탐색기"
