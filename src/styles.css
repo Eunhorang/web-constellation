@@ -601,6 +601,7 @@ main:focus-visible {
   border-radius: 50%;
   background: transparent;
   cursor: pointer;
+  transition: transform 160ms ease;
 }
 
 .constellation-node__button::before {

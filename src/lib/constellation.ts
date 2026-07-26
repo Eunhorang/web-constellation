@@ -74,3 +74,28 @@ export function buildConstellation(projects: Project[]): {
 
   return { nodes, edges };
 }
+
+export interface Point {
+  x: number;
+  y: number;
+}
+
+const MAGNETIC_PULL_STRENGTH = 0.35;
+
+export function computeMagneticOffset(
+  pointer: Point,
+  center: Point,
+  maxOffset: number,
+): Point {
+  const dx = pointer.x - center.x;
+  const dy = pointer.y - center.y;
+  const distance = Math.hypot(dx, dy);
+  if (distance === 0) return { x: 0, y: 0 };
+
+  const clampedDistance = Math.min(
+    distance,
+    maxOffset / MAGNETIC_PULL_STRENGTH,
+  );
+  const factor = (clampedDistance * MAGNETIC_PULL_STRENGTH) / distance;
+  return { x: dx * factor, y: dy * factor };
+}

@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import { SectionHeading } from "./Common";
-import { buildConstellation } from "@/lib/constellation";
+import { buildConstellation, computeMagneticOffset } from "@/lib/constellation";
 import { requestProjectCard } from "@/lib/project-navigation";
 import { projectIdToken, STATUS_LABELS } from "@/lib/projects";
 import type { Project } from "@/types/project";
@@ -10,6 +10,12 @@ export function ConstellationMap({ projects }: { projects: Project[] }) {
   const [hoveredRepo, setHoveredRepo] = useState<string | null>(null);
   const [focusedRepo, setFocusedRepo] = useState<string | null>(null);
   const [dismissedRepo, setDismissedRepo] = useState<string | null>(null);
+  // 마우스가 가까이 온 노드 하나만 커서 쪽으로 살짝 끌어당깁니다.
+  const [magnetOffset, setMagnetOffset] = useState<
+    { repo: string; x: number; y: number } | null
+  >(null);
+  // 움직임 최소화 설정을 매번 다시 조회하지 않도록 ref에 담아 둡니다.
+  const reducedMotionRef = useRef(false);
   // 마우스로 가리킨 좌표를 우선해 한 번에 설명 하나만 표시합니다.
   const activeRepo = hoveredRepo ?? focusedRepo;
 
@@ -33,6 +39,34 @@ export function ConstellationMap({ projects }: { projects: Project[] }) {
       setDismissedRepo(null);
     }
   }, [dismissedRepo, focusedRepo, hoveredRepo]);
+
+  useEffect(() => {
+    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updatePreference = () => {
+      reducedMotionRef.current = query.matches;
+    };
+    updatePreference();
+    query.addEventListener("change", updatePreference);
+    return () => query.removeEventListener("change", updatePreference);
+  }, []);
+
+  // 마우스 포인터일 때만 작동합니다. 터치와 키보드 포커스에서는 아무 일도 하지 않습니다.
+  const handleNodePointerMove =
+    (repo: string) => (event: PointerEvent<HTMLButtonElement>) => {
+      if (reducedMotionRef.current || event.pointerType !== "mouse") return;
+      const rect = event.currentTarget.getBoundingClientRect();
+      const center = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+      const offset = computeMagneticOffset(
+        { x: event.clientX, y: event.clientY },
+        center,
+        4,
+      );
+      setMagnetOffset({ repo, x: offset.x, y: offset.y });
+    };
+
+  const clearMagnetOffset = (repo: string) => {
+    setMagnetOffset((current) => (current?.repo === repo ? null : current));
+  };
 
   if (projects.length === 0) return null;
 
@@ -92,9 +126,20 @@ export function ConstellationMap({ projects }: { projects: Project[] }) {
                 data-featured={node.project.featured}
                 data-tooltip-side={node.tooltipSide}
                 data-tooltip-visible={tooltipVisible}
+                style={
+                  magnetOffset?.repo === node.project.repo
+                    ? {
+                        transform: `translate(${magnetOffset.x}px, ${magnetOffset.y}px)`,
+                      }
+                    : undefined
+                }
                 onClick={() => requestProjectCard(node.project.repo)}
                 onPointerEnter={() => setHoveredRepo(node.project.repo)}
-                onPointerLeave={() => setHoveredRepo(null)}
+                onPointerMove={handleNodePointerMove(node.project.repo)}
+                onPointerLeave={() => {
+                  setHoveredRepo(null);
+                  clearMagnetOffset(node.project.repo);
+                }}
                 onFocus={() => setFocusedRepo(node.project.repo)}
                 onBlur={() => setFocusedRepo(null)}
                 aria-label={`${node.project.title}, ${node.project.category}, ${STATUS_LABELS[node.project.status]} — 프로젝트 카드로 이동`}
