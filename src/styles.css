@@ -584,8 +584,9 @@ main:focus-visible {
 }
 
 /* 섹션이 화면에 들어오면 선마다 지연 시간을 두고 차례로 나타납니다. */
+/* both = 지연 시간 동안에도 첫 키프레임(opacity 0)을 적용해, 순서를 기다리는 선이 잠깐 보였다 꺼지지 않게 합니다. */
 .reveal-in .constellation__lines line {
-  animation: line-fade-in 520ms ease forwards;
+  animation: line-fade-in 520ms ease both;
 }
 
 @keyframes line-fade-in {
