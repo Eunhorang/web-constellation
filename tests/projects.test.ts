@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   filterProjects,
+  formatCardIndex,
   formatKoreanDate,
   formatKoreanDateTime,
   formatKoreanYear,
@@ -247,5 +248,14 @@ describe("한국 시간 날짜 표시", () => {
     expect(formatKoreanDateTime(newYearInKorea)).toContain("2026년 1월 1일");
     expect(formatKoreanDateTime(newYearInKorea)).toContain("01:00");
     expect(formatKoreanYear(newYearInKorea)).toBe("2026");
+  });
+});
+
+describe("카드 인덱스 표시", () => {
+  it("한 자리 순번은 앞에 0을 붙이고 두 자리 이상은 그대로 쓴다", () => {
+    expect(formatCardIndex(1)).toBe("01");
+    expect(formatCardIndex(9)).toBe("09");
+    expect(formatCardIndex(12)).toBe("12");
+    expect(formatCardIndex(123)).toBe("123");
   });
 });

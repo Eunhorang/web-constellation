@@ -283,3 +283,7 @@ export function formatKoreanYear(value: string): string {
   if (Number.isNaN(date.getTime())) return KOREAN_YEAR_FORMATTER.format(new Date());
   return KOREAN_YEAR_FORMATTER.format(date);
 }
+
+export function formatCardIndex(position: number): string {
+  return String(position).padStart(2, "0");
+}

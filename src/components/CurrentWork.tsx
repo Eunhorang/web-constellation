@@ -17,8 +17,13 @@ export function CurrentWork({ projects }: { projects: Project[] }) {
         id="current-work-title"
       />
       <div className="project-grid project-grid--current">
-        {current.map((project) => (
-          <ProjectCard key={project.repo} project={project} variant="compact" />
+        {current.map((project, index) => (
+          <ProjectCard
+            key={project.repo}
+            project={project}
+            variant="compact"
+            index={index + 1}
+          />
         ))}
       </div>
     </section>

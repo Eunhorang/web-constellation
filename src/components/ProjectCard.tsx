@@ -2,6 +2,7 @@ import { memo, type CSSProperties } from "react";
 import { ExternalLink, StatusBadge } from "./Common";
 import { GitBranchIcon } from "./Icons";
 import {
+  formatCardIndex,
   formatKoreanDate,
   formatKoreanDateTime,
   projectElementId,
@@ -12,12 +13,14 @@ interface ProjectCardProps {
   project: Project;
   variant?: "featured" | "standard" | "compact";
   withAnchor?: boolean;
+  index?: number;
 }
 
 export const ProjectCard = memo(function ProjectCard({
   project,
   variant = "standard",
   withAnchor = false,
+  index,
 }: ProjectCardProps) {
   const latestUpdate = project.updateHistory[0];
   const previousUpdates = project.updateHistory.slice(1, 6);
@@ -38,6 +41,11 @@ export const ProjectCard = memo(function ProjectCard({
       </div>
 
       <div className="project-card__copy">
+        {typeof index === "number" ? (
+          <p className="project-card__index" aria-hidden="true">
+            {formatCardIndex(index)}
+          </p>
+        ) : null}
         <h3>{project.title}</h3>
         <p>{project.description}</p>
       </div>

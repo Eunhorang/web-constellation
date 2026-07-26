@@ -14,8 +14,13 @@ export function FeaturedProjects({ projects }: { projects: Project[] }) {
         id="featured-title"
       />
       <div className="project-grid project-grid--featured">
-        {projects.map((project) => (
-          <ProjectCard key={project.repo} project={project} variant="featured" />
+        {projects.map((project, index) => (
+          <ProjectCard
+            key={project.repo}
+            project={project}
+            variant="featured"
+            index={index + 1}
+          />
         ))}
       </div>
     </section>

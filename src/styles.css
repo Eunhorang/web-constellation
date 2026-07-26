@@ -857,6 +857,16 @@ main:focus-visible {
   margin-top: 1.4rem;
 }
 
+.project-card__index {
+  margin: 0 0 0.35rem;
+  color: var(--project-accent);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 750;
+  letter-spacing: 0.14em;
+  font-variant-numeric: tabular-nums;
+}
+
 .project-card__copy h3 {
   margin: 0;
   overflow-wrap: anywhere;

@@ -340,8 +340,13 @@ export function ProjectExplorer({ projects }: { projects: Project[] }) {
       {results.length > 0 ? (
         <>
           <div id="project-results" className="project-grid project-grid--all">
-            {visibleResults.map((project) => (
-              <ProjectCard key={project.repo} project={project} withAnchor />
+            {visibleResults.map((project, index) => (
+              <ProjectCard
+                key={project.repo}
+                project={project}
+                withAnchor
+                index={index + 1}
+              />
             ))}
           </div>
           {remainingCount > 0 ? (
