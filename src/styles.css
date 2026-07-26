@@ -309,10 +309,10 @@ main:focus-visible {
   max-width: 12ch;
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(3rem, 6.5vw, 5.75rem);
-  font-weight: 720;
-  letter-spacing: -0.045em;
-  line-height: 1.08;
+  font-size: clamp(3.1rem, 7.4vw, 6.75rem);
+  font-weight: 740;
+  letter-spacing: -0.05em;
+  line-height: 1.05;
   text-wrap: balance;
 }
 
@@ -502,10 +502,10 @@ main:focus-visible {
 .hero-stats dd {
   margin: 0.15rem 0 0;
   font-family: var(--font-display);
-  font-size: 1.9rem;
-  font-weight: 700;
-  letter-spacing: -0.035em;
-  line-height: 1.15;
+  font-size: 2.15rem;
+  font-weight: 760;
+  letter-spacing: -0.04em;
+  line-height: 1.12;
   font-variant-numeric: tabular-nums;
 }
 
