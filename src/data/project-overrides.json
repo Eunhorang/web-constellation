@@ -168,5 +168,20 @@
     "accent": "#6d7d65",
     "launchedAt": "2026-07-22",
     "note": "GitHub Pages로 공개된 초등학생 자투리 시간용 태블릿 활동 모음입니다."
+  },
+  {
+    "repo": "classroom-one-page",
+    "title": "교실 한 장",
+    "order": 13
+  },
+  {
+    "repo": "slow-human-lab",
+    "title": "느린 인간 연구소",
+    "order": 14
+  },
+  {
+    "repo": "book-song",
+    "title": "책이 노래가 될 때",
+    "order": 15
   }
 ]

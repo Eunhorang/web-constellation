@@ -1,9 +1,83 @@
 {
   "schemaVersion": 1,
   "githubUsername": "Eunhorang",
-  "generatedAt": "2026-07-26T14:41:08.707Z",
+  "generatedAt": "2026-08-10T01:26:23.014Z",
   "source": "github",
   "projects": [
+    {
+      "repo": "book-song",
+      "title": "Book Song",
+      "description": "책에서 건진 질문을 노래와 가사 해석으로 만나는 음악 아카이브",
+      "githubUrl": "https://github.com/Eunhorang/book-song",
+      "homepageUrl": "https://eunhorang.github.io/book-song/",
+      "hasPages": true,
+      "pagesUrl": null,
+      "liveUrl": "https://eunhorang.github.io/book-song/",
+      "language": "CSS",
+      "topics": [],
+      "stars": 0,
+      "updatedAt": "2026-08-10T00:24:00Z",
+      "archived": false,
+      "fork": false,
+      "updateHistory": [
+        {
+          "date": "2026-08-10T00:24:00Z",
+          "summary": "새 웹사이트가 공개 프로젝트 목록에 등록되었습니다."
+        }
+      ]
+    },
+    {
+      "repo": "slow-human-lab",
+      "title": "Slow Human Lab",
+      "description": "도구가 빨라질수록, 사람은 무엇을 더 천천히 배워야 할까? — 읽기·질문·말·쓰기·책임을 연습하는 한국어 인문학 사이트",
+      "githubUrl": "https://github.com/Eunhorang/slow-human-lab",
+      "homepageUrl": "https://eunhorang.github.io/slow-human-lab/",
+      "hasPages": true,
+      "pagesUrl": null,
+      "liveUrl": "https://eunhorang.github.io/slow-human-lab/",
+      "language": "TypeScript",
+      "topics": [],
+      "stars": 0,
+      "updatedAt": "2026-08-02T07:48:32Z",
+      "archived": false,
+      "fork": false,
+      "updateHistory": [
+        {
+          "date": "2026-08-02T07:48:32Z",
+          "summary": "새 웹사이트가 공개 프로젝트 목록에 등록되었습니다."
+        }
+      ]
+    },
+    {
+      "repo": "web-constellation",
+      "title": "Web Constellation",
+      "description": "이정주가 만든 웹 프로젝트를 한곳에 모은 개인 웹 아카이브",
+      "githubUrl": "https://github.com/Eunhorang/web-constellation",
+      "homepageUrl": "https://eunhorang.github.io/web-constellation/",
+      "hasPages": true,
+      "pagesUrl": "https://eunhorang.github.io/web-constellation/",
+      "liveUrl": "https://eunhorang.github.io/web-constellation/",
+      "language": "TypeScript",
+      "topics": [],
+      "stars": 0,
+      "updatedAt": "2026-07-26T17:32:13Z",
+      "archived": false,
+      "fork": false,
+      "updateHistory": [
+        {
+          "date": "2026-07-26T17:32:13Z",
+          "summary": "GitHub 저장소에 새 코드가 반영되었습니다."
+        },
+        {
+          "date": "2026-07-22T14:22:21Z",
+          "summary": "GitHub 저장소에 새 코드가 반영되었습니다."
+        },
+        {
+          "date": "2026-07-13T14:40:37Z",
+          "summary": "업데이트 기록 수집을 시작한 코드 기준입니다."
+        }
+      ]
+    },
     {
       "repo": "lee-jeongju-writer-portfolio",
       "title": "Lee Jeongju Writer Portfolio",
@@ -53,32 +127,6 @@
         {
           "date": "2026-07-25T14:24:51Z",
           "summary": "새 웹사이트가 공개 프로젝트 목록에 등록되었습니다."
-        }
-      ]
-    },
-    {
-      "repo": "web-constellation",
-      "title": "Web Constellation",
-      "description": "이정주가 만든 웹 프로젝트를 한곳에 모은 개인 웹 아카이브",
-      "githubUrl": "https://github.com/Eunhorang/web-constellation",
-      "homepageUrl": "https://eunhorang.github.io/web-constellation/",
-      "hasPages": true,
-      "pagesUrl": "https://eunhorang.github.io/web-constellation/",
-      "liveUrl": "https://eunhorang.github.io/web-constellation/",
-      "language": "TypeScript",
-      "topics": [],
-      "stars": 0,
-      "updatedAt": "2026-07-22T14:22:21Z",
-      "archived": false,
-      "fork": false,
-      "updateHistory": [
-        {
-          "date": "2026-07-22T14:22:21Z",
-          "summary": "GitHub 저장소에 새 코드가 반영되었습니다."
-        },
-        {
-          "date": "2026-07-13T14:40:37Z",
-          "summary": "업데이트 기록 수집을 시작한 코드 기준입니다."
         }
       ]
     },

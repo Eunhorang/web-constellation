@@ -15,7 +15,8 @@ const vite = await createServer({
   appType: "custom",
   logLevel: "error",
   mode: "production",
-  server: { middlewareMode: true },
+  // 정적 HTML 생성에는 브라우저 자동 새로고침용 WebSocket이 필요하지 않습니다.
+  server: { middlewareMode: true, hmr: false, ws: false },
 });
 
 try {

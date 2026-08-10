@@ -199,16 +199,6 @@ function buildUpdateHistory(current, previous) {
   }
 
   if (previous.updatedAt === current.updatedAt) {
-    const changedFields = changedRepositoryFields(current, previous);
-    if (changedFields.length > 0) {
-      return [
-        {
-          date: current.updatedAt,
-          summary: `프로젝트 공개 정보가 변경되었습니다. 바뀐 항목: ${changedFields.join(", ")}.`,
-        },
-        ...previousHistory.slice(1),
-      ];
-    }
     return previousHistory;
   }
 

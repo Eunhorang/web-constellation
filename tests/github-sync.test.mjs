@@ -261,7 +261,7 @@ describe("GitHub 저장소 수집", () => {
     );
   });
 
-  it("설명에서 삭제한 문구는 같은 코드 날짜의 누적 기록에도 남기지 않는다", async () => {
+  it("같은 코드 날짜에서는 설명을 갱신하되 기존 기록을 교체하지 않는다", async () => {
     const previousCache = cacheWith([
       cachedProject("metadata-safe", {
         description: "삭제해야 할 이전 공개 설명",
@@ -293,8 +293,9 @@ describe("GitHub 저장소 수집", () => {
     });
     const serialized = JSON.stringify(result.data.projects[0].updateHistory);
 
+    expect(result.data.projects[0].description).toBe("개인정보를 제거한 새 설명");
     expect(result.data.projects[0].updateHistory[0].summary).toBe(
-      "프로젝트 공개 정보가 변경되었습니다. 바뀐 항목: 프로젝트 설명.",
+      "업데이트 기록 수집을 시작한 코드 기준입니다.",
     );
     expect(serialized).not.toContain("삭제해야 할 이전 공개 설명");
   });
